@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html ng-app="MyApp">
+<head lang="en">
+  <meta charset="UTF-8">
+  <link rel="stylesheet" type="text/css" href="assets/style.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+  <script src="../dist/angular-google-maps-native.min.js"></script>
+  <script src="assets/tools.js"></script>
+  <script>
+    angular.module('MyApp', ['GoogleMapsNative', 'ExampleTools'])
+
+        .controller('MyCtrl', function ($scope, console) {
+          $scope.console = console;
+        })
+    ;
+
+  </script>
+</head>
+<body ng-controller="MyCtrl" ng-init="showInfo=true">
+  <div class="panel">
+    <div class="item">
+      <label>
+        <input type="checkbox" ng-model="showInfo"> Show the infowindow
+      </label>
+    </div>
+  </div>
+
+  <gm-map options="{center: [40.780, -73.967], zoom: 9}">
+
+    <gm-marker options="{position:  [40.750, -73], draggable: true}">
+      <gm-infowindow
+          ng-show="showInfo"
+          options="{content: 'Hello World from marker!'}"
+          on-closeclick="console.log('closed #1')"
+      >
+      </gm-infowindow>
+    </gm-marker>
+
+    <gm-infowindow
+        ng-if="showInfo"
+        options="{content: 'Hello World from map!', position:  [40.73685214795608,-74.3060302734375]}"
+        on-closeclick="console.log('closed #2')"
+    >
+    </gm-infowindow>
+
+  </gm-map>
+
+  <console></console>
+
+</body>
+</html>

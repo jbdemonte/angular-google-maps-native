@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html ng-app="MyApp">
+<head lang="en">
+  <meta charset="UTF-8">
+  <link rel="stylesheet" type="text/css" href="assets/style.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+  <script src="../dist/angular-google-maps-native.min.js"></script>
+  <script src="assets/tools.js"></script>
+  <script>
+    angular.module('MyApp', ['GoogleMapsNative', 'ExampleTools'])
+
+        .controller('MyCtrl', function ($scope, console) {
+          $scope.console = console;
+        })
+    ;
+
+  </script>
+</head>
+<body ng-controller="MyCtrl">
+  <div class="panel">
+    <div class="item">
+      <label>
+        <input type="checkbox" ng-model="showMarker"> Show the marker
+      </label>
+    </div>
+  </div>
+
+  <gm-map options="{center: [37.772323, -122.214897], zoom: 4, mapTypeId: google.maps.MapTypeId.ROADMAP}">
+    <gm-marker
+        ng-show="showMarker" options="{position:  [40.750, -73], draggable: true}"
+        on-dragend="console.log('dragend on {' + marker.getPosition().lat() + ',' + marker.getPosition().lng() + '}')"
+    >
+    </gm-marker>
+  </gm-map>
+
+  <console></console>
+
+</body>
+</html>

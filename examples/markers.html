@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html ng-app="MyApp">
+<head lang="en">
+  <meta charset="UTF-8">
+  <link rel="stylesheet" type="text/css" href="assets/style.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+  <script src="../dist/angular-google-maps-native.min.js"></script>
+  <script src="assets/tools.js"></script>
+  <script>
+    angular.module('MyApp', ['GoogleMapsNative', 'ExampleTools'])
+
+        .controller('MyCtrl', function ($scope, console) {
+          $scope.console = console;
+
+          $scope.items = [
+             {position: [41.21444529917117,-78.2734375], name: "Point 1"},
+             {position: [32.51281509243061,-83.986328125], name: "Point 2"},
+             {position: [39.33709791014559,-87.150390625], name: "Point 3"},
+             {position: [42.910812044859036,-99.19140625], name: "Point 4"},
+             {position: [36.847358278821424,-109.2109375], name: "Point 5"},
+             {position: [41.609935469410566,-116.505859375], name: "Point 6"}
+          ];
+        })
+    ;
+
+  </script>
+</head>
+<body ng-controller="MyCtrl" ng-init="showMarker=true">
+
+  <div class="panel">
+    <div class="item">
+      <label>
+        <input type="checkbox" ng-model="showMarker"> Show the markers
+      </label>
+    </div>
+  </div>
+
+  <gm-map options="{center: [37.772323, -122.214897], zoom: 4, mapTypeId: google.maps.MapTypeId.ROADMAP}">
+    <gm-marker
+        ng-show="showMarker"
+        ng-repeat="item in items" options="{position: item.position}"
+        on-click="console.log(item.name + ': ' + marker.getPosition().lat() + ',' + marker.getPosition().lng())"
+    >
+    </gm-marker>
+  </gm-map>
+
+  <console></console>
+
+</body>
+</html>

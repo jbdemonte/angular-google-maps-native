@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html ng-app="MyApp">
+<head lang="en">
+  <meta charset="UTF-8">
+  <link rel="stylesheet" type="text/css" href="assets/style.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+  <script src="../dist/angular-google-maps-native.min.js"></script>
+  <script src="assets/tools.js"></script>
+  <script>
+    angular.module('MyApp', ['GoogleMapsNative', 'ExampleTools'])
+
+        .controller('MyCtrl', function ($scope, console) {
+          $scope.console = console;
+        })
+    ;
+
+  </script>
+</head>
+<body ng-controller="MyCtrl" ng-init="showRectangle=true">
+  <div class="panel">
+    <div class="item">
+      <label>
+        <input type="checkbox" ng-model="showRectangle"> Show the rectangle
+      </label>
+    </div>
+  </div>
+
+  <gm-map options="{center: [40.76754167005723,-73.95103454589844], zoom: 12, mapTypeId: google.maps.MapTypeId.ROADMAP}">
+    <gm-rectangle
+        ng-show="showRectangle"
+        options="{bounds: {n:40.780, e:-73.932, s:40.742, w:-73.967}, fillColor: '#F4AFFF', strokeColor: '#CB53DF'}"
+    ></gm-rectangle>
+  </gm-map>
+
+  <console></console>
+
+</body>
+</html>
