@@ -10,8 +10,8 @@ angular.module('ExampleTools', [])
         s = dt.getSeconds(),
         t = (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
       item.msg = '<time>' + t + '</time> ' + item.msg;
-      items.unshift(item);
-      items.splice(10, items.length); // only keep last 10 entries
+      items.push(item);
+      items.splice(0, items.length - 10); // only keep last 10 entries
     }
     return {
       log: function (msg) {
