@@ -1,0 +1,27 @@
+{
+  "name": "angular-google-maps-native",
+  "version": "1.0.0",
+  "description": "AngularJS directives for the Google Maps Javascript API using the native way",
+  "author": {
+    "name": "Jean-Baptiste DEMONTE",
+    "email": "jbdemonte@gmail.com",
+    "url": "http://jb.demonte.fr"
+  },
+  "license": "GPL-3.0+",
+  "main": "./dist/angular-google-maps-native.min.js",
+  "keywords": [
+    "angularjs",
+    "google",
+    "maps",
+    "googlemaps",
+    "directives"
+  ],
+  "dependencies": {
+    "angular": "1.2 - 1.4"
+  },
+  "ignore": [
+    "*.json",
+    "examples",
+    "README.md"
+  ]
+}
