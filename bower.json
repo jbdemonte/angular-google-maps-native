@@ -22,6 +22,9 @@
   "ignore": [
     "*.json",
     "examples",
+    "src",
+    "gulpfile.js",
+    ".gitignore",
     "README.md"
   ]
 }
