@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html ng-app="MyApp">
+  <head>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+    <script src="../angular-google-maps-native.min.js"></script>
+    <script src="app.js"></script>
+  </head>
+  <body ng-init="coords={latitude: false, longitude: false}">
+
+    <gm-map options="{center: [37.772323, -122.214897], zoom: 8, mapTypeId: google.maps.MapTypeId.ROADMAP}">
+      <gm-marker options="{position:  [37.772323, -122.214897], draggable: true}" on-dragend="coords.latitude=marker.getPosition().lat(); coords.longitude=marker.getPosition().lng()">
+        <gm-infowindow options="{content: 'Drag me!'}"></gm-infowindow>
+      </gm-marker>
+    </gm-map>
+
+    <div ng-if="coords.latitude !== false">Dragend on [{{coords.latitude}}, {{coords.longitude}}]</div>
+  </body>
+</html>

@@ -9,6 +9,10 @@ body {
   line-height: 1.5;
   color: #606c71; }
 
+pre {
+  font-size: 13px;
+}
+
 a {
   color: #1e6bb8;
   text-decoration: none; }
@@ -115,6 +119,7 @@ a {
   color: #159957; }
 .main-content p {
   margin-bottom: 1em; }
+/** /
 .main-content code {
   padding: 2px 4px;
   font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
@@ -141,8 +146,10 @@ a {
     white-space: pre;
     background: transparent;
     border: 0; }
+/**/
 .main-content .highlight {
   margin-bottom: 1rem; }
+/** /
   .main-content .highlight pre {
     margin-bottom: 0;
     word-break: normal; }
@@ -164,6 +171,7 @@ a {
   border: 0; }
   .main-content pre code:before, .main-content pre code:after, .main-content pre tt:before, .main-content pre tt:after {
     content: normal; }
+/**/
 .main-content ul, .main-content ol {
   margin-top: 0; }
 .main-content blockquote {
