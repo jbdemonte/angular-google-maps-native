@@ -1,62 +1,23 @@
-<!DOCTYPE html>
-<html lang="en-us" ng-app="project">
-  <head>
-    <meta charset="UTF-8">
-    <title>Angular-google-maps-native by jbdemonte</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="vendors/prism/prism.css" media="screen">
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/custom.css" media="screen">
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
-    <script src="vendors/prism/prism.js"></script>
-    <script src="scripts/app.js"></script>
-  </head>
-  <body>
-    <section class="page-header">
-      <h1 class="project-name">Angular-google-maps-native</h1>
-      <h2 class="project-tagline">AngularJS directives for the Google Maps Javascript API using the native way</h2>
-      <a href="https://github.com/jbdemonte/angular-google-maps-native" class="btn">View on GitHub</a>
-      <a href="https://github.com/jbdemonte/angular-google-maps-native/zipball/master" class="btn">Download .zip</a>
-      <a href="https://github.com/jbdemonte/angular-google-maps-native/tarball/master" class="btn">Download .tar.gz</a>
-    </section>
+---
+layout: default
+active: home
+---
 
-    <section class="main-content">
+<p>
+  <strong>Angular Google Maps Native</strong> is a set of AngularJS directives which allows to create Google Maps using the <a href="https://developers.google.com/maps/documentation/javascript/">Google Maps Javascript API</a> syntax.
+</p>
+<p>
+  It is based on the Google Maps Javascript API version 3.
+</p>
 
-      <p>
-        <strong>Angular Google Maps Native</strong> is a set of AngularJS directives which allows to create Google Maps using the <a href="https://developers.google.com/maps/documentation/javascript/">Google Maps Javascript API</a> syntax.
-      </p>
-      <p>
-        The directives syntax is as close as possible of the Google Maps library to not only provide a limited subset of the API.
-      </p>
-      <p>
-        It is based on the Google Maps Javascript API version 3.
-      </p>
+<h2>Why using Angular Google Maps Native</h2>
 
-      <h2>Example</h2>
+<p>
+  Google Maps is a great library to create maps, and AngularJS is just amazing. <br />
+  Most of modules available to handle Google Maps into AngularJS directives suffer of limitations and provides a custom syntax to handle a subset of the Google Maps API.<br />
+  The goal of <em>Angular Google Maps Native</em> is to a full provide access to the Google Maps API using the Google Maps syntax into the AngularJS directives with the smaller controller code requirements possible.
+</p>
 
-      <snippets path="demo" files="['index.html', 'app.js', 'style.css']"></snippets>
+<h2>Example</h2>
 
-      <footer class="site-footer">
-        <span class="site-footer-owner"><a href="https://github.com/jbdemonte/angular-google-maps-native">Angular-google-maps-native</a> is maintained by <a href="https://github.com/jbdemonte">jbdemonte</a>, author of the <a href="http://gmap3.net/">gmap3</a> plugin for jQuery.</span>
-      </footer>
-    </section>
-
-
-    <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-      ga('create', 'UA-6491890-13', 'auto');
-      ga('send', 'pageview');
-
-    </script>
-
-  </body>
-</html>
-
+<snippets path="snippets/demo"></snippets>
