@@ -4,6 +4,15 @@ html {
 ol li + li {
   margin-top: 30px;
 }
+strong.danger {
+  color: #f00;
+  font-weight: normal;
+  border: 1px solid #f00;
+  border-radius: 0.3rem;
+  display: block;
+  padding: 5px;
+  margin: 5px 0;
+}
 nav.navbar {
   min-height: 0;
 }
@@ -32,6 +41,13 @@ nav.navbar #navbar-collapse .divider-vertical {
   overflow: hidden;
   background-color: #222;
   border-right: 1px solid #333;
+}
+snippets {
+  display: block;
+  margin: 10px 0;
+}
+snippets-tabs nav {
+  margin-bottom: 10px;
 }
 snippets-tabs .btn {
   font-size: 14px;

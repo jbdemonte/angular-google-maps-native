@@ -1,0 +1,61 @@
+---
+layout: api
+---
+
+<h2>Directives</h2>
+
+<h3>Instanciation</h3>
+<p>
+  Basically, directives intend to create a google.maps object or to use a google service (e.g. <a href="https://developers.google.com/maps/documentation/javascript/directions" target="_blank">directions</a>).<br />
+  Each time, directives accept an <em>options</em> attribute which depends on google object or service. <br />
+  <strong class="danger"><em>options</em> uses google.maps object / service native definition and does not watch AngularJS expressions</strong>
+  The only pre-process done on <em>options</em> is the <a href="api.html#api-latlng">LatLng</a> / <a href="api.html#api-latlngbounds">LatLngBounds</a> cast.
+</p>
+
+<h3>Watched expression</h3>
+<p>
+  For the most case, each google.maps native object which provide unit methods to update parameters watch same name parameters.<br />
+  e.g. <doc>Map</doc> provide <em>setHeading</em>, <em>setTilt</em>,... so <a href="api-gmMap.html">gm-map</a> watches <em>heading</em>, <em>tilt</em>... expressions.
+</p>
+
+<h3>Scope</h3>
+<p>
+  Once google maps library is loaded, the gm-map directive scope provide <em>google</em> object which can be used in the attributes as below:
+</p>
+<pre class="code"><code class="language-markup">&lt;gm-map options="{center: [37, -122], zoom: 8, mapTypeId: google.maps.MapTypeId.ROADMAP}"&gt;&lt;/gm-map&gt;</code></pre>
+<p>
+  Each directive use a child scope which provides its own google maps native object.<br />
+  e.g. In the HTML structure:
+</p>
+<ul>
+  <li>gm-map: provides <doc to="Map">map</doc>
+    <ul>
+      <li>gm-marker: provides <doc to="Marker">marker</doc> (and see <doc to="Map">map</doc>)
+        <ul>
+          <li>
+            gm-infowindow: provides <doc to="InfoWindow">infowindow</doc> (and see <doc to="Map">map</doc> and <doc to="Marker">marker</doc>)
+          </li>
+        </ul>
+      </li>
+      <li>gm-circle: provides <doc to="Circle">circle</doc> (and see <doc to="Map">map</doc>)</li>
+    </ul>
+  </li>
+</ul>
+
+<h2>Events</h2>
+<p>
+  All <a href="https://developers.google.com/maps/documentation/javascript/events" target="_blank">events</a> are directly usable in the directive with the prefix <em>on</em> (addListener) or <em>once</em> (addListenerOnce).
+  <br />
+  They use a child scope not isolated which provides an <em>event</em> object whose depends on the event type (see google documentation).
+</p>
+<params>
+  <item name="event" type="object,none">Depends on event type (e.g. <doc>MouseEvent</doc>).</item>
+</params>
+<pre class="code"><code class="language-markup">
+  &lt;gm-map
+  options="{center: [37, -122], zoom:8, mapTypeId: google.maps.MapTypeId.ROADMAP}"
+  on-zoom-changed="log('zoom_changed: ' + map.getZoom())"
+  on-click="log('click: {' + event.latLng.lat() + ',' + event.latLng.lng() + '}')"
+  once-drag="log('drag once')"
+  &gt;
+  &lt;/gm-map&gt;</code></pre>

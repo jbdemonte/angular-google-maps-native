@@ -1,0 +1,45 @@
+---
+layout: api
+---
+
+<h2>gm-map</h2>
+
+<strong>Parent</strong>
+<p>
+  <em>None</em>
+</p>
+
+<strong>Scope</strong>
+<params>
+  <item name="map" type="object">
+    <doc>Map</doc>
+  </item>
+</params>
+
+<strong>Parameters</strong>
+<params>
+  <item name="center" type="expression" optional>
+    <a href="api.html#api-latlng">LatLng</a> to update the map center with.
+  </item>
+  <item name="heading" type="expression" optional>
+    Number to update the map heading with.
+  </item>
+  <item name="tilt" type="expression" optional>
+    Number to update the map tilt with.
+  </item>
+  <item name="zoom" type="expression" optional>
+    Number to update the map zoom with.
+  </item>
+  <item name="mapTypeId" type="expression" optional>
+    <doc>MapTypeId</doc> to update the map type with.
+  </item>
+</params>
+
+<p>
+  To be displayed, <doc>Map</doc> require a value for each of these parameters: center, mapTypeId and zoom.
+  It can be provided by <em>options</em> and / or watched expressions.
+</p>
+
+<strong>Example:</strong>
+
+<snippets path="snippets/api-map"></snippets>

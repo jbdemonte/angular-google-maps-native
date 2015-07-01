@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html ng-app="MyApp">
+  <head>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+    <script src="../angular-google-maps-native.min.js"></script>
+    <script>
+      angular.module('MyApp', ['GoogleMapsNative']);
+    </script>
+  </head>
+  <body ng-init="data={}">
+
+  <div>
+    <button ng-click="data.target=[48.85341, 2.3488]; data.zoom=5">Paris</button>
+    <button ng-click="data.target=[48, -74]; data.zoom=5">Quebec</button>
+  </div>
+
+  <gm-map
+      center="data.target"
+      zoom="data.zoom"
+      options="{center: [37.772323, -122.214897], zoom: 8, mapTypeId: google.maps.MapTypeId.ROADMAP}"
+      on-zoom-changed="data.zoom = map.getZoom()"
+      on-center-changed="data.center = map.getCenter()"
+      on-click="data.click = event.latLng"
+  ></gm-map>
+
+  <div ng-if="data.zoom">
+    Current Zoom: {{data.zoom}}
+  </div>
+  <div ng-if="data.center">
+    Current Center: {{data.center.lat()}}, {{data.center.lng()}}
+  </div>
+  <div ng-if="data.click">
+    Last Click: {{data.click.lat()}}, {{data.click.lng()}}
+  </div>
+
+  </body>
+</html>

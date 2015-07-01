@@ -4,31 +4,7 @@ layout: api
 
 <h2>API</h2>
 
-<h3>Scope</h3>
-<p>
-  Once google maps library is loaded, the gm-map directive scope provide <em>google</em> object which can be used in the attributes as below:
-</p>
-<pre class="code"><code class="language-markup">&lt;gm-map options="{center: [37, -122], zoom: 8, mapTypeId: google.maps.MapTypeId.ROADMAP}"&gt;&lt;/gm-map&gt;</code></pre>
-<p>
-  Each directive use a child scope which provides its own google maps native object.<br />
-  e.g. In the HTML structure:
-</p>
-<ul>
-  <li>gm-map: provides <doc to="Map">map</doc>
-    <ul>
-      <li>gm-marker: provides <doc to="Marker">marker</doc> (and see <doc to="Map">map</doc>)
-        <ul>
-          <li>
-            gm-infowindow: provides <doc to="InfoWindow">infowindow</doc> (and see <doc to="Map">map</doc> and <doc to="Marker">marker</doc>)
-          </li>
-        </ul>
-      </li>
-      <li>gm-circle: provides <doc to="Circle">circle</doc> (and see <doc to="Map">map</doc>)</li>
-    </ul>
-  </li>
-</ul>
-
-<h2>google.maps.LatLng</h2>
+<h2 id="api-latlng">google.maps.LatLng</h2>
 <p>
   You can either use native <doc>LatLng</doc> or one of the following formats:
 </p>
@@ -37,7 +13,7 @@ layout: api
   <li>{lat:float, lng:float} : object of 2 floats</li>
 </ul>
 
-<h2>google.maps.LatLngBounds</h2>
+<h2 id="api-latlngbounds">google.maps.LatLngBounds</h2>
 <p>
   You can either use native <doc>LatLngBounds</doc> or one of the following formats:
 </p>
@@ -47,21 +23,3 @@ layout: api
   <li>[ne, sw] : array of 2 <doc>LatLng</doc></li>
   <li>{ne:LatLng, sw:LatLng} : object of 2 <doc>LatLng</doc></li>
 </ul>
-
-<h2>Events</h2>
-<p>
-  All <a href="https://developers.google.com/maps/documentation/javascript/events" target="_blank">events</a> are directly usable in the directive with the prefix <em>on</em> (addListener) or <em>once</em> (addListenerOnce).
-  <br />
-  They use a child scope which provides an <em>event</em> object whose depends on the event type (see google documentation).
-</p>
-<params>
-  <item name="event" type="object,none">Depends on event type (e.g. <doc>MouseEvent</doc>).</item>
-</params>
-<pre class="code"><code class="language-markup">
-&lt;gm-map
-    options="{center: [37, -122], zoom:8, mapTypeId: google.maps.MapTypeId.ROADMAP}"
-    on-zoom-changed="log('zoom_changed: ' + map.getZoom())"
-    on-click="log('click: {' + event.latLng.lat() + ',' + event.latLng.lng() + '}')"
-    once-drag="log('drag once')"
-    &gt;
-&lt;/gm-map&gt;</code></pre>
