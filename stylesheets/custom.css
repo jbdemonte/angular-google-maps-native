@@ -56,3 +56,44 @@ snippets-tabs .btn.active {
 pre.code {
   font-size: 12px;
 }
+#api-summary {
+  font-size: 14px;
+  padding: 5px;
+  border: 1px solid #c0c0c0;
+  border-radius: 0.3rem;
+}
+#api-summary ul {
+  padding: 0;
+}
+#api-summary li {
+  list-style: none;
+}
+#api-summary li ul {
+  padding-left: 10px;
+}
+params {
+  margin: 10px 0;
+  display: block;
+}
+params td {
+  position: relative;
+}
+params td:first-child {
+  text-align: center;
+}
+params .fa-book {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+}
+params p {
+  margin: 0 !important;
+}
+params p.default em {
+  color: #ffaa6e;
+  font-style: normal;
+}
+params p.example em {
+  color: #ff6e7e;
+  font-style: normal;
+}

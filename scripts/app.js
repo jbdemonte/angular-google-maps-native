@@ -17,6 +17,12 @@ angular.module('project', ['Snippets', 'SnippetsThemeBootstrapButtons'])
       };
   })
 
+  .filter('safe', ['$sce', function($sce){
+    return function(text) {
+      return $sce.trustAsHtml(text);
+    };
+  }])
+
   .directive('params', function () {
     return {
       restrict: 'E',
@@ -44,10 +50,23 @@ angular.module('project', ['Snippets', 'SnippetsThemeBootstrapButtons'])
           name: attrs.name,
           types: (attrs.type || '').split(','),
           optional: 'optional' in attrs,
-          contents: "<p>" + element.html() + "</p>"
+          doc: attrs.doc,
+          contents: '<p>' + element.html() + '</p>' +
+                    ('default' in attrs ? '<p class="default"> default = <em>' + attrs.default + '</em></p>' : '') +
+                    ('example' in attrs ? '<p class="example"> e.g. <em>' + attrs.example + '</em></p>' : '')
         };
         element.remove();
         ctrl.add(item);
+      }
+    };
+  })
+
+  .directive('doc', function () {
+    return {
+      restrict: 'E',
+      link: function (scope, element, attrs) {
+        var item = element.html();
+        element.html('<a href="https://developers.google.com/maps/documentation/javascript/reference#' + item + '" target="_blank">google.maps.' + item + '</a>');
       }
     };
   })

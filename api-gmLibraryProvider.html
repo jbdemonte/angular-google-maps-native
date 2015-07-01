@@ -1,0 +1,37 @@
+---
+layout: api
+---
+
+<h2>gmLibraryProvider</h2>
+
+<params>
+  <item name="configure" type="function">
+    Configure library loading.<br />
+    function (option:<a href="#configure-options">ConfigureOptions</a>)
+  </item>
+</params>
+
+<strong id="configure-options">ConfigureOptions</strong> (object)
+
+<params>
+  <item name="url" type="string" optional default="https://maps.googleapis.com/maps/api/js">
+    Library url.
+  </item>
+  <item name="version" type="string" optional default="3">
+    Library version to use.
+  </item>
+  <item name="libraries" type="array" optional default="[]" example="['drawing', 'geometry']" doc="https://developers.google.com/maps/documentation/javascript/libraries">
+    Array of string.
+  </item>
+  <item name="language" type="string" optional default="en">
+    Library language
+  </item>
+  <item name="sensor" type="boolean" optional default="false" doc="https://developers.google.com/maps/articles/geolocation#SpecifyingSensor">
+    Parameter to indicate whether your application used a sensor to determine the user's location.<br />
+  </item>
+  <item name="callback" type="string" optional default="__mapLibraryLoaded">
+    Name of the global window callback used by the library after load
+  </item>
+</params>
+
+All others keys / values set in the options object will be added to the library url.

@@ -1,7 +1,8 @@
 .variables-matrix {
-  border: 1px solid #C3C3C3;
+  border: 0;
   width: 100%;
   margin: 10px 0;
+  font-size: 13px;
 }
 
 .variables-matrix td,
@@ -12,6 +13,10 @@
 
 .variables-matrix td {
   border-top:1px solid #eee;
+}
+.variables-matrix th:last-child,
+.variables-matrix td:last-child {
+  width: 100%;
 }
 
 .variables-matrix td + td,
