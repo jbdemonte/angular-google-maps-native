@@ -1,0 +1,35 @@
+---
+layout: api
+---
+
+<h2>gm-infowindow</h2>
+
+<strong>Parent</strong>
+<ul>
+  <li><a href="api-gmMap.html">map</a></li>
+  <li><a href="api-gmMarker.html">marker</a></li>
+</ul>
+<p>
+  If the parent is a <a href="api-gmMarker.html">marker</a>, the <doc>InfoWindow</doc> will open using the parent marker as anchor.
+</p>
+
+<strong>Scope</strong>
+<params>
+  <item name="infowindow" type="object">
+    <doc>InfoWindow</doc>
+  </item>
+</params>
+
+<strong>Parameters</strong>
+<params>
+  <item name="options" type="object" optional>
+    <doc>InfoWindowOptions</doc>
+  </item>
+  <item name="position" type="expression" optional>
+    <a href="api.html#api-latlng">LatLng</a> to update the InfoWindow position with.
+  </item>
+</params>
+
+<strong>Example:</strong>
+
+<snippets path="snippets/api-infowindow"></snippets>
