@@ -1,0 +1,16 @@
+---
+layout: api-snippets
+---
+{% raw %}
+<body>
+<label><input type="checkbox" ng-model="showCircle"> Show the circle</label>
+
+<gm-map options="{center: [37, -122], zoom: 4, mapTypeId: google.maps.MapTypeId.ROADMAP}">
+  <gm-circle
+      ng-show="showCircle"
+      options="{center: map.getCenter(), radius: 250000, fillColor: '#008BB2', strokeColor: '#005BB7'}"
+      ></gm-circle>
+</gm-map>
+
+</body>
+{% endraw %}
