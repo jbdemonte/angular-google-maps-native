@@ -66,7 +66,7 @@ angular.module('project', ['Snippets', 'SnippetsThemeBootstrapButtons'])
       restrict: 'E',
       link: function (scope, element, attrs) {
         var item = element.html();
-        element.html('<a href="https://developers.google.com/maps/documentation/javascript/reference#' + item + '" target="_blank">google.maps.' + item + '</a>');
+        element.html('<a href="https://developers.google.com/maps/documentation/javascript/reference#' + (attrs.to || item) + '" target="_blank">' + (attrs.to ? item :  'google.maps.' + item) + '</a>');
       }
     };
   })
