@@ -1,0 +1,16 @@
+---
+layout: api-snippets
+---
+{% raw %}
+<body>
+<label><input type="checkbox" ng-model="showRectangle"> Show the rectangle</label>
+
+<gm-map options="{center: [40.76,-73.95], zoom: 12, mapTypeId: google.maps.MapTypeId.ROADMAP}">
+  <gm-rectangle
+    ng-show="showRectangle"
+    options="{bounds: {n:40.780, e:-73.932, s:40.742, w:-73.967}, fillColor: '#F4AFFF', strokeColor: '#CB53DF'}"
+    ></gm-rectangle>
+</gm-map>
+
+</body>
+{% endraw %}
