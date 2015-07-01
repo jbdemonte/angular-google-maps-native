@@ -1,0 +1,16 @@
+---
+layout: api-snippets
+---
+{% raw %}
+<body>
+  <button ng-click="destination='Bondi Beach, NSW'">address 1</button>
+  <button ng-click="destination='Newtown'">address 2</button>
+  <button ng-click="destination=[-33.9,151.23]">address 3</button>
+
+  <gm-map options="{center: [40.750, -73], zoom: 9}">
+    <gm-directions destination="destination" options="{origin: '48 Pirrama Road, Pyrmont NSW', travelMode: google.maps.DirectionsTravelMode.DRIVING}">
+      <gm-renderer options="{polylineOptions:{strokeColor: '#0077c4', strokeWeight: 4, strokeOpacity: 1.0}}"></gm-renderer>
+    </gm-directions>
+  </gm-map>
+</body>
+{% endraw %}

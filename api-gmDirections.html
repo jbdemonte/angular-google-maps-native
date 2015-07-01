@@ -1,0 +1,59 @@
+---
+layout: api
+---
+
+<h2>gm-directions</h2>
+
+<p>
+  This directive consume the <a href="https://developers.google.com/maps/documentation/javascript/directions" target="_blank">DirectionsService</a> and provide its result to his child.<br />
+  It does not display anything.
+</p>
+
+<strong>Parent</strong>
+<ul><li><a href="api-gmMap.html">map</a></li></ul>
+
+<strong>Scope</strong>
+<params>
+  <item name="directions" type="object">
+    <a href="#Result">Result</a>
+  </item>
+</params>
+
+<strong id="Result">Result</strong>
+<params>
+  <item name="status" type="string">
+    <a href="https://developers.google.com/maps/documentation/javascript/directions#DirectionsStatus" target="_blank">DirectionsStatus</a>
+  </item>
+  <item name="result" type="object">
+    <a href="https://developers.google.com/maps/documentation/javascript/directions#DisplayingResults" target="_blank">DirectionsResult</a>
+  </item>
+</params>
+
+<strong>Parameters</strong>
+<params>
+  <item name="options" type="object" optional>
+    <a href="https://developers.google.com/maps/documentation/javascript/directions#DirectionsRequests" target="_blank">DirectionsRequests</a>
+  </item>
+  <item name="origin" type="expression" optional>
+    <a href="api.html#api-latlng">LatLng</a> | String
+  </item>
+  <item name="destination" type="expression" optional>
+    <a href="api.html#api-latlng">LatLng</a> | String
+  </item>
+  <item name="travelMode" type="expression" optional>
+    <a href="https://developers.google.com/maps/documentation/javascript/directions#TravelModes" target="_blank">Travel Modes</a>
+  </item>
+</params>
+
+<strong>Required value to be run</strong>
+<ul>
+  <li>origin</li>
+  <li>destination</li>
+  <li>travelMode</li>
+</ul>
+
+<strong>Example:</strong>
+
+<p>
+  See <a href="api-gmRenderer.html#example">renderer example</a>.
+</p>
