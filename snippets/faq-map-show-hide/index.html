@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html ng-app="MyApp">
+  <head>
+    <style>gm-map {display: block; width: 100%; height: 300px;}</style>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+    <script src="../angular-google-maps-native.min.js"></script>
+    <script>angular.module('MyApp', ['GoogleMapsNative']);</script>
+  </head>
+  <body ng-init="hideMap=false">
+
+  <label><input type="checkbox" ng-model="showMap"> Show the map</label>
+  <gm-map ng-show="showMap" options="{center: [37.772323, -122.214897], zoom: 8, mapTypeId: google.maps.MapTypeId.ROADMAP}"></gm-map>
+
+  </body>
+</html>
