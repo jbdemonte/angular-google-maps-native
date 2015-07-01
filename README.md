@@ -1,3 +1,5 @@
 # angular-google-maps-native
 
-Angular way to use Google maps API.
+AngularJS directives for the Google Maps Javascript API using the native way.
+
+[Project page](http://jbdemonte.github.io/angular-google-maps-native/)
