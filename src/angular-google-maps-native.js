@@ -165,7 +165,7 @@
       /**
        * Load script
        */
-      function load($window, $q) {
+      function load($document, $window, $q) {
         var script, callback = options.callback;
 
         if (!loading) {
@@ -177,7 +177,7 @@
           // callback function - resolving promise after maps successfully loaded
           $window[callback] = function () {
             delete $window[callback];
-            googleMap = google.maps;
+            googleMap = $window.google.maps;
             if (!googleMap) {
               throw "google.maps library not found";
             }
@@ -185,10 +185,10 @@
           };
 
           // append script to dom
-          script = document.createElement('script');
+          script = $document[0].createElement('script');
           script.type = 'text/javascript';
           script.src = url();
-          document.body.appendChild(script);
+          $document.find("body").append(script);
         }
 
         return deferred.promise;
@@ -202,7 +202,7 @@
         angular.extend(options, opts);
       };
 
-      this.$get = ['$window', '$q', function ($window, $q) {
+      this.$get = ['$document', '$window', '$q', function ($document, $window, $q) {
         return {
           /**
            * Populate scope
@@ -216,7 +216,7 @@
            * @returns {Promise}
            */
           load: function () {
-            return load($window, $q);
+            return load($document, $window, $q);
           }
         };
       }];
