@@ -202,7 +202,7 @@
         angular.extend(options, opts);
       };
 
-      this.$get = ['$document', '$window', '$q', function ($document, $window, $q) {
+      this.$get = ['$document', '$window', '$rootScope', '$q', function ($document, $window, $rootScope, $q) {
         return {
           /**
            * Populate scope
@@ -210,6 +210,7 @@
            */
           populate: function (scope) {
             scope.google = google;
+            $rootScope.google = google;
           },
           /**
            * Async load google map library
