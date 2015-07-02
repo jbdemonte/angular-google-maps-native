@@ -33,7 +33,7 @@
       Zoom: <select ng-model="zoom" ng-options="o as o for o in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]"></select>
     </div>
     <div class="item" ng-show="showMap">
-      mapTypeID: <select ng-model="data.mapTypeID" ng-options="o as o for o in ['roadmap', 'satellite', 'hybrid', 'terrain']" required ></select>
+      mapTypeID: <select ng-model="data.mapTypeID" ng-options="o as o for o in [google.maps.MapTypeId.ROADMAP, google.maps.MapTypeId.SATELLITE, google.maps.MapTypeId.HYBRID, google.maps.MapTypeId.TERRAIN]" required ></select>
     </div>
     <div class="item" ng-show="showMap">
       GoTo:
