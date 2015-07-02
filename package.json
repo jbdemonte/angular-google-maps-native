@@ -1,8 +1,8 @@
 {
   "name": "angular-google-maps-native",
-  "version": "1.0.0",
-  "date": "2015-06-20",
-  "description": "AngularJS directives for the Google Maps Javascript API using the native way",
+  "version": "1.1.0",
+  "date": "2015-07-02",
+  "description": "AngularJS directives for the Google Maps API using the native way",
   "author": {
     "name": "Jean-Baptiste DEMONTE",
     "email": "jbdemonte@gmail.com",
