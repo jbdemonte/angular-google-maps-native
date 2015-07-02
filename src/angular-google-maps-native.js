@@ -377,7 +377,7 @@
            * Proceed to link
            */
           function run() {
-            var options = {};
+            var stop, options = {};
 
             // evaluate options from element attribute
             if (attrs.options) {
@@ -394,14 +394,13 @@
             if (options.center) {
               create(options);
             } else {
-              gmTools.watch(
-                scope, attrs, controller, 'center',
-                function (center) {
-                  options.center = toLatLng(center);
+              stop = scope.$watch('center', function (value) {
+                if (angular.isDefined(value)) {
+                  stop();
+                  options.center = toLatLng(value);
                   create(options);
-                },
-                true // only one time
-              );
+                }
+              });
             }
 
             gmTools.watch(scope, attrs, controller, 'heading tilt zoom', function (value) {
