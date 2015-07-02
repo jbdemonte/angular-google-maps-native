@@ -14,7 +14,7 @@ layout: api
 
 <h3>Scope</h3>
 <p>
-  Once google maps library is loaded, the gm-map directive scope provide <em>google</em> object which can be used in the attributes as below:
+  Once the google maps library is loaded, the <em>google</em> object is set into the <em>$rootScope</em>, so, it can be used in the attributes as below:
 </p>
 <pre class="code"><code class="language-markup">&lt;gm-map options="{center: [37, -122], zoom: 8, mapTypeId: google.maps.MapTypeId.ROADMAP}"&gt;&lt;/gm-map&gt;</code></pre>
 <p>
