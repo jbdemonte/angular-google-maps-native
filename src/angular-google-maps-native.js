@@ -767,7 +767,7 @@
     .directive('gmRenderer', ['$parse', 'gmOverlayBuilder', function ($parse, gmOverlayBuilder) {
       return gmOverlayBuilder.builder({
         directive: 'gmRenderer',
-        name: 'directionsRenderer',
+        name: 'renderer',
         cls: 'DirectionsRenderer',
         require: ['^gmDirections'],
         create: function (scope, element, attrs, controllers, options, create) {
