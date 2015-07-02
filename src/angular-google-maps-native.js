@@ -261,7 +261,7 @@
           angular.forEach(features.split(' '), function (feature) {
             var stop,
               normalised = feature.toLowerCase();
-            if (normalised && normalised in attrs) {
+            if (normalised in attrs) {
               stop = scope.$watch(attrs[normalised], function (value) {
                 if (angular.isDefined(value)) {
                   if (once) {
@@ -330,11 +330,13 @@
             callback(options);
           }
           if (!once || !isComplete()) {
-            angular.forEach(mandatories, function (name) {
-              if (name in attrs) {
-                handlers.push(scope.$watch(name, function (value) {
+            angular.forEach(mandatories, function (feature) {
+              var normalised = feature.toLowerCase();
+
+              if (normalised in attrs) {
+                handlers.push(scope.$watch(attrs[normalised], function (value) {
                   if (angular.isDefined(value)) {
-                    options[name] = value;
+                    options[feature] = value;
                     if (isComplete()) {
                       // stop all watches
                       if (once) {
@@ -346,8 +348,8 @@
                     }
                   }
                 }));
-              } else if (!angular.isDefined(options[name])) {
-                gmLogger.error(name + ' not defined');
+              } else if (!angular.isDefined(options[feature])) {
+                gmLogger.error(feature + ' not defined');
               }
             });
           }
