@@ -3,9 +3,12 @@ describe('Provider', function () {
   var provider, gmLibrary,
     $window, $document, $q, $rootScope;
 
+  //---------------------------------------------------------------------------
+  // Load Provider
+  //---------------------------------------------------------------------------
+
   beforeEach(function () {
-    var fakeModule = angular.module('test.app.config', function () {
-    });
+    var fakeModule = angular.module('test.app.config', function () {});
 
     fakeModule.config(function (gmLibraryProvider) {
       provider = gmLibraryProvider;
@@ -16,12 +19,20 @@ describe('Provider', function () {
     inject(function () {});
   });
 
+  //---------------------------------------------------------------------------
+  // Inject required
+  //---------------------------------------------------------------------------
+
   beforeEach(inject(function(_$window_, _$document_, _$q_, _$rootScope_){
     $window = _$window_;
     $document = _$document_;
     $q = _$q_;
     $rootScope = _$rootScope_;
   }));
+
+  //---------------------------------------------------------------------------
+  // TESTS
+  //---------------------------------------------------------------------------
 
   it('tests script inclusion', function () {
 
@@ -41,7 +52,7 @@ describe('Provider', function () {
 
     provider.configure(options);
 
-    gmLibrary = provider.$get[3]($document, $window, $q);
+    gmLibrary = provider.$get[4]($document, $window, $rootScope, $q);
 
     // just to be sure of the test
     expect($window.__callback).to.be.an('undefined');
