@@ -223,7 +223,7 @@
     })
 
     .factory('gmTools', ['$parse', '$timeout', function ($parse, $timeout) {
-      return {
+      var gmTools = {
 
         /**
          * Bind events on google map object from attributes
@@ -249,15 +249,15 @@
         },
 
         /**
-         * Observe some attributes and run google maps functions
+         * Observe some attributes and run callback
          * @param scope {Scope}
          * @param attrs {Attributes}
          * @param controller {Controller}
          * @param features {string} space separated attribute names to observes
-         * @param cast {function} (optional) allow to preprocess value observed
+         * @param callback {function} callback to run
          * @param once {boolean} (optional, default=false) watch only one time
          */
-        watch: function (scope, attrs, controller, features, cast, once) {
+        watch: function (scope, attrs, controller, features, callback, once) {
           angular.forEach(features.split(' '), function (feature) {
             var stop,
               normalised = feature.toLowerCase();
@@ -267,15 +267,91 @@
                   if (once) {
                     stop();
                   }
-                  controller.then(function (obj) {
-                    obj['set' + ucfirst(feature)](cast ? cast(value) : value);
-                  });
+                  callback(value, feature);
                 }
               });
             }
           });
+        },
+
+        /**
+         * Observe some attributes and run google maps generic functions (setX, setY)
+         * @param scope {Scope}
+         * @param attrs {Attributes}
+         * @param controller {Controller}
+         * @param features {string} space separated attribute names to observes
+         * @param cast {function} (optional) allow to preprocess value observed
+         * @param once {boolean} (optional, default=false) watch only one time
+         */
+        prop: function (scope, attrs, controller, features, cast, once) {
+          gmTools.watch(
+            scope,
+            attrs,
+            controller,
+            features,
+            function (value, feature) {
+              controller.then(function (obj) {
+                obj['set' + ucfirst(feature)](cast ? cast(value) : value);
+              });
+            },
+            once
+          );
+        },
+
+        /**
+         * Observe some attributes and wait all of them to run a callback
+         * @param scope {Scope}
+         * @param attrs {Attributes}
+         * @param controller {Controller}
+         * @param features {string} space separated attribute names to observes
+         * @param callback {function} callback to run
+         * @param once {boolean} (optional, default=false) watch only one time
+         */
+        wait: function (scope, attrs, controller, features, callback, once) {
+
+          var handlers = [],
+            mandatories = features.split(" "),
+            options = {};
+
+          function isComplete() {
+            var result = true;
+            angular.forEach(mandatories, function (name) {
+              result = result && options[name];
+            });
+            return result;
+          }
+
+          // evaluate options from element attribute
+          if (attrs.options) {
+            options = $parse(attrs.options)(scope);
+          }
+
+          if (isComplete()) {
+            callback(options);
+          }
+          if (!once || !isComplete()) {
+            angular.forEach(mandatories, function (name) {
+              if (name in attrs) {
+                handlers.push(scope.$watch(name, function (value) {
+                  if (angular.isDefined(value)) {
+                    options[name] = value;
+                    if (isComplete()) {
+                      // stop all watches
+                      if (once) {
+                        angular.forEach(handlers, function (handler) {
+                          handler();
+                        });
+                      }
+                      callback(options);
+                    }
+                  }
+                }));
+              }
+            });
+          }
         }
       };
+      return gmTools;
     }])
 
     .factory('gmLogger', function () {
@@ -365,51 +441,30 @@
             } else {
               controller._build(elem, options);
             }
-
-            if ('center' in attrs) {
-              controller.then(function () {
-                gmTools.watch(scope, attrs, controller, 'center', toLatLng);
-              });
-            }
           }
 
-          /**
-           * Proceed to link
-           */
-          function run() {
-            var stop, options = {};
-
-            // evaluate options from element attribute
-            if (attrs.options) {
-              options = $parse(attrs.options)(scope);
-              if (options.center) {
+          gmLibrary.load().then(function () {
+            gmTools.wait(
+              scope,
+              attrs,
+              controller,
+              'center',
+              function (options) {
                 options.center = toLatLng(options.center);
-              }
-            }
+                create(options);
 
-            if (!options.center && !('center' in attrs)) {
-              return gmLogger.error('center not defined');
-            }
+                gmTools.prop(scope, attrs, controller, 'center', toLatLng);
 
-            if (options.center) {
-              create(options);
-            } else {
-              stop = scope.$watch('center', function (value) {
-                if (angular.isDefined(value)) {
-                  stop();
-                  options.center = toLatLng(value);
-                  create(options);
-                }
-              });
-            }
+                gmTools.prop(scope, attrs, controller, 'mapTypeId');
 
-            gmTools.watch(scope, attrs, controller, 'heading tilt zoom', function (value) {
-              return 1 * value;
-            });
-            gmTools.watch(scope, attrs, controller, 'mapTypeId');
-          }
-
-          gmLibrary.load().then(run);
+                gmTools.prop(scope, attrs, controller, 'heading tilt zoom', function (value) {
+                  return 1 * value;
+                });
+                gmTools.prop(scope, attrs, controller, 'mapTypeId');
+              },
+              true // once only
+            );
+          });
         }
       };
     }])
@@ -538,54 +593,41 @@
                 } else {
                   controller._build(options);
                 }
-
-                if (buildOptions.main && buildOptions.main.name in attrs) {
-                  controller.then(function () {
-                    gmTools.watch(scope, attrs, controller, buildOptions.main.name, buildOptions.main.cast);
-                  });
-                }
               }
 
-              /**
-               * Proceed to link
-               */
-              function run(map) {
+              mapController.then(function (map) {
                 var options = {};
 
-                // evaluate options from element attribute
-                if (attrs.options) {
-                  options = $parse(attrs.options)(scope);
-                  if (buildOptions.main && options[buildOptions.main.name]) {
-                    options[buildOptions.main.name] = buildOptions.main.cast(options[buildOptions.main.name]);
-                  }
-                }
-
-                if (!buildOptions.create || !buildOptions.create(scope, element, attrs, controllers, options, create)) {
-
-                  // Options generally require google map, so, we add it by default
-                  options.map = map;
-
-                  if (options[buildOptions.main.name]) {
-                    create(options);
-                  } else {
-                    if (buildOptions.main.name in attrs) {
-                      gmTools.watch(
-                        scope, attrs, controller, buildOptions.main.name,
-                        function (value) {
-                          options[buildOptions.main.name] = buildOptions.main.cast ? buildOptions.main.cast(value) : value;
-                          create(options);
-                        },
-                        true // only one time
-                      );
-                    } else {
-                      return gmLogger.error(
-                        buildOptions.main.name + ' not defined for ' + buildOptions.directive
-                      );
+                // if build provide a custom constructor, use it
+                if (buildOptions.create) {
+                  if (attrs.options) {
+                    options = $parse(attrs.options)(scope);
+                    if (buildOptions.main && options[buildOptions.main.name]) {
+                      options[buildOptions.main.name] = buildOptions.main.cast(options[buildOptions.main.name]);
                     }
                   }
+                  // if it satisfy the creation, return
+                  if (buildOptions.create(scope, element, attrs, controllers, options, create)) {
+                    return;
+                  }
                 }
-              }
-              mapController.then(run);
+
+                // no custom contructor or does not satisfy the creation, so, use default one
+                gmTools.wait(
+                  scope,
+                  attrs,
+                  controller,
+                  buildOptions.main.name,
+                  function (options) {
+                    if (buildOptions.main.cast) {
+                      options[buildOptions.main.name] = buildOptions.main.cast(options[buildOptions.main.name]);
+                    }
+                    options.map = map;
+                    create(options);
+                    gmTools.prop(scope, attrs, controller, buildOptions.main.name, buildOptions.main.cast);
+                  }
+                );
+              });
             }
           };
         }
@@ -670,7 +712,7 @@
       });
     }])
 
-    .directive('gmDirections', ['$q', '$timeout', '$parse', function ($q, $timeout, $parse) {
+    .directive('gmDirections', ['$q', '$timeout', '$parse', 'gmTools', function ($q, $timeout, $parse, gmTools) {
       return {
         restrict: 'E',
         scope: true,
@@ -721,44 +763,17 @@
           var controller = controllers[0],
             mapController = controllers[1];
 
-          /**
-           * Proceed to link
-           */
-          function run() {
-            var mandatories = ['origin', 'destination', 'travelMode'],
-              options = {};
-
-            function isComplete() {
-              var result = true;
-              angular.forEach(mandatories, function (name) {
-                result = result && options[name];
-              });
-              return result;
-            }
-
-            // evaluate options from element attribute
-            if (attrs.options) {
-              options = $parse(attrs.options)(scope);
-            }
-
-            if (isComplete()) {
-              controller._run(options);
-            }
-            angular.forEach(mandatories, function (name) {
-              if (name in attrs) {
-                scope.$watch(name, function (value) {
-                  if (angular.isDefined(value)) {
-                    options[name] = value;
-                    if (isComplete()) {
-                      controller._run(options);
-                    }
-                  }
-                });
+          mapController.then(function () {
+            gmTools.wait(
+              scope,
+              attrs,
+              controller,
+              'origin destination travelMode',
+              function (options) {
+                controller._run(options);
               }
-            });
-          }
-
-          mapController.then(run);
+            );
+          });
         }
       };
     }])
