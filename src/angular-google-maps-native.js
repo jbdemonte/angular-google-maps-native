@@ -450,9 +450,10 @@
               scope,
               attrs,
               controller,
-              'center',
+              'center zoom',
               function (options) {
                 options.center = toLatLng(options.center);
+                options.zoom = 1 * options.zoom;
                 create(options);
 
                 gmTools.prop(scope, attrs, controller, 'center', toLatLng);
