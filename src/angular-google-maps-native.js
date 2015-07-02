@@ -222,7 +222,7 @@
       }];
     })
 
-    .factory('gmTools', ['$parse', '$timeout', function ($parse, $timeout) {
+    .factory('gmTools', ['$parse', '$timeout', 'gmLogger', function ($parse, $timeout, gmLogger) {
       var gmTools = {
 
         /**
@@ -346,6 +346,8 @@
                     }
                   }
                 }));
+              } else if (!angular.isDefined(options[name])) {
+                gmLogger.error(name + ' not defined');
               }
             });
           }
@@ -362,7 +364,7 @@
       };
     })
 
-    .directive('gmMap', ['$q', '$timeout', '$parse', 'gmLibrary', 'gmLogger', 'gmTools', function ($q, $timeout, $parse, gmLibrary, gmLogger, gmTools) {
+    .directive('gmMap', ['$q', '$timeout', '$parse', 'gmLibrary', 'gmTools', function ($q, $timeout, $parse, gmLibrary, gmTools) {
       return {
         restrict: 'E',
         scope: true,
@@ -469,7 +471,7 @@
       };
     }])
 
-    .service('gmOverlayBuilder', ['$q', '$timeout', '$parse', 'gmTools', 'gmLogger', function ($q, $timeout, $parse, gmTools, gmLogger) {
+    .service('gmOverlayBuilder', ['$q', '$timeout', '$parse', 'gmTools', function ($q, $timeout, $parse, gmTools) {
       return {
         /**
          *
