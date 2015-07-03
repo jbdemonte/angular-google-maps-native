@@ -10,4 +10,4 @@ AngularJS directives for the Google Maps Javascript API using the native way.
 [npm-image]: https://badge.fury.io/js/angular-google-maps-native.png
 
 [travis-url]: http://travis-ci.org/jbdemonte/angular-google-maps-native
-[travis-image]: https://secure.travis-ci.org/jbdemonte/angular-google-maps-native?branch=master
+[travis-image]: https://secure.travis-ci.org/jbdemonte/angular-google-maps-native.png?branch=master
