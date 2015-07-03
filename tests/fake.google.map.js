@@ -1,15 +1,35 @@
 var google = (function () {
 
+  function ucfirst(str) {
+    str += '';
+    return str.charAt(0).toUpperCase() + str.substr(1);
+  }
+
+
+  function createGenericObject(options) {
+    function F() {
+      this.__data = {};
+    }
+
+    // append getter / setter for property list
+    angular.forEach((options.prop || '').split(' '), function (feature) {
+      var uc = ucfirst(feature);
+      F.prototype['set' + uc] = function (value) {
+        this.__data[feature] = value;
+      };
+      F.prototype['get' + uc] = function () {
+        return this.__data[feature];
+      };
+    });
+    return F;
+  }
+
   var maps = {};
 
-  maps.Map = function () {
-    var data = this.__data = {};
+  maps.Map = createGenericObject({
+    prop: 'center div heading mapTypeId projection streetView tilt zoom'
+  });
 
-    this.setCenter = function (center) {
-      data.center = center;
-    };
-
-  };
 
   maps.LatLng = function (lat, lng) {
 
