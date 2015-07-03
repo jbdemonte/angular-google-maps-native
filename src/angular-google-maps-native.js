@@ -466,7 +466,6 @@
                 gmTools.prop(scope, attrs, controller, 'heading tilt zoom', function (value) {
                   return 1 * value;
                 });
-                gmTools.prop(scope, attrs, controller, 'mapTypeId');
               },
               true // once only
             );
