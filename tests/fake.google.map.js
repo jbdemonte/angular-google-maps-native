@@ -9,6 +9,10 @@ var google = (function () {
   function createGenericObject(options) {
     function F() {
       this.__data = {};
+      this.__events = {};
+      this.__get = function (name) {
+        return this.__data[name];
+      };
     }
 
     // append getter / setter for property list
@@ -30,7 +34,6 @@ var google = (function () {
     prop: 'center div heading mapTypeId projection streetView tilt zoom'
   });
 
-
   maps.LatLng = function (lat, lng) {
 
     this.lat = function () {
@@ -42,19 +45,37 @@ var google = (function () {
     };
   };
 
-  maps.event = function () {
+
+
+  maps.event = (function () {
+
     function add(obj, name, fn, once) {
-      obj.__events = (obj.__events || {});
       obj.__events[name] = (obj.__events[name] || []);
-      obj.__events[name].push({fn: fn, once: once})
+      obj.__events[name].push({fn: fn, once: once});
+      return obj.__events[name]. length - 1;
     }
-    this.addListener = function (obj, name, fn) {
-      add(obj, name, fn);
+
+    return {
+      addListener: function (obj, name, fn) {
+        return add(obj, name, fn, false);
+      },
+      addListenerOnce: function (obj, name, fn) {
+        return add(obj, name, fn, true);
+      },
+      trigger: function (obj, name) {
+        if (obj && obj.__events && obj.__events[name]) {
+          angular.forEach(obj.__events[name], function (item, key) {
+            if (item) {
+              if (item.once) {
+                obj.__events[name][key] = null;
+              }
+              item.fn();
+            }
+          });
+        }
+      }
     };
-    this.addListenerOnce = function () {
-      add(obj, name, fn, true);
-    };
-  };
+  }());
 
 
   return {maps: maps}
