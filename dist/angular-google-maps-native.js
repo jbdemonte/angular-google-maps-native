@@ -1,7 +1,7 @@
 /*!
  *  angular-google-maps-native
- *  Version   : 1.1.0
- *  Date      : 2015-07-02
+ *  Version   : 1.1.1
+ *  Date      : 2015-07-04
  *  Author    : DEMONTE Jean-Baptiste
  *  Contact   : jbdemonte@gmail.com
  *  Licence   : GPL v3 : http://www.gnu.org/licenses/gpl.html
