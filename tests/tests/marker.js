@@ -52,7 +52,7 @@ describe('gmMarker', function () {
     expect(scope.marker.getPosition().lng()).to.be.equal(scope.map.getCenter().lng());
   });
 
-  it('wait for center', function () {
+  it('wait for position', function () {
     compile('<gm-marker position="pos"></gm-marker>');
     expect(scope.map instanceof googleMaps.Map).to.be.equal(true);
     expect(scope.marker instanceof googleMaps.Marker).to.be.equal(false);
@@ -62,8 +62,6 @@ describe('gmMarker', function () {
     expect(scope.marker.getPosition().lat()).to.be.equal(1);
     expect(scope.marker.getPosition().lng()).to.be.equal(2);
   });
-
-
 
   it('test events', function () {
 
@@ -97,7 +95,6 @@ describe('gmMarker', function () {
 
   });
 
-
   it('test ng-show', function () {
 
     compile('<gm-marker ng-show="visible" options="{position: [1, 2]}"></gm-marker>');
@@ -117,7 +114,6 @@ describe('gmMarker', function () {
     expect(scope.marker.getMap()).to.be.an('null');
 
   });
-
 
   it('test ng-hide', function () {
 
@@ -140,6 +136,5 @@ describe('gmMarker', function () {
     expect(scope.marker.getMap()).to.be.an('null');
 
   });
-
 
 });
