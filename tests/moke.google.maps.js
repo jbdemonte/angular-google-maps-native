@@ -57,6 +57,11 @@ var google = (function () {
     constructor: true
   });
 
+  maps.Rectangle = createGenericObject({
+    prop: 'bounds draggable editable map visible',
+    constructor: true
+  });
+
   maps.LatLng = function (lat, lng) {
 
     this.lat = function () {
@@ -65,6 +70,17 @@ var google = (function () {
 
     this.lng = function () {
       return lng;
+    };
+  };
+
+  maps.LatLngBounds = function (sw, ne) {
+
+    this.sw = function () {
+      return sw;
+    };
+
+    this.ne = function () {
+      return ne;
     };
   };
 

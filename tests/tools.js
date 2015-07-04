@@ -48,5 +48,19 @@ var testTools = {
 
       expect($rootScope.google).not.to.be.an('undefined');
     });
+  },
+
+  test: {
+    latLng: function (latLng, lat, lng) {
+      expect(latLng.lat()).to.be.equal(lat);
+      expect(latLng.lng()).to.be.equal(lng);
+    },
+    latLngBounds: function (latLngBounds, n, e, s, w) {
+      expect(latLngBounds.ne().lat()).to.be.equal(n);
+      expect(latLngBounds.ne().lng()).to.be.equal(e);
+      expect(latLngBounds.sw().lat()).to.be.equal(s);
+      expect(latLngBounds.sw().lng()).to.be.equal(w);
+    }
   }
+
 };
