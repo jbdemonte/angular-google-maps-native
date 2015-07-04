@@ -13,6 +13,9 @@ var google = (function () {
       this.__get = function (name) {
         return this.__data[name];
       };
+      if (options.constructor) {
+        options.constructor.apply(this, arguments)
+      }
     }
 
     // append getter / setter for property list
@@ -31,7 +34,15 @@ var google = (function () {
   var maps = {};
 
   maps.Map = createGenericObject({
-    prop: 'center div heading mapTypeId projection streetView tilt zoom'
+    prop: 'center div heading mapTypeId projection streetView tilt zoom',
+    constructor: function (mapDiv, options) {
+      this.__data.__mapDiv = mapDiv;
+      angular.extend(this.__data, options);
+    }
+  });
+
+  maps.Marker = createGenericObject({
+    prop: 'animation attribution clickable cursor draggable icon map opacity place position shape title visible zIndex'
   });
 
   maps.LatLng = function (lat, lng) {

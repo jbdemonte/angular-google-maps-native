@@ -16,6 +16,8 @@ module.exports = function(config) {
       'node_modules/angular-mocks/angular-mocks.js',
       //'dist/angular-google-maps-native.js',
       'dist/angular-google-maps-native.min.js',
+      'tests/moke.google.maps.js',
+      'tests/tools.js',
       'tests/**/*.js'
     ],
 
