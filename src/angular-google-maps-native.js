@@ -689,14 +689,19 @@
           infowindow.close();
         },
         create: function (scope, element, attrs, controllers, options, create) {
-          if (controllers[1]) { // marker controller
-            controllers[1].then(function (marker) {
-              options.anchor = marker;
-              create(options);
-            });
-            return true;
-          }
-          return false;
+          var infowindowController = controllers[0],
+            markerController = controllers[1],
+            mapController = controllers[2];
+
+          (markerController || mapController).then(function () {
+            create(options);
+            if (!attrs.ngShow && !attrs.ngHide) { // visibility is not handled, so, we need to open it
+              infowindowController.then(function (infowindow) {
+                infowindow.open(mapController.get(), markerController ? markerController.get() : null);
+              });
+            }
+          });
+          return true;
         },
         visibility: function (scope, element, attrs, controllers, value) {
           /*
