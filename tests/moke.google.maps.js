@@ -77,6 +77,11 @@ var google = (function () {
     this.__data.__opened = false;
   };
 
+  maps.DirectionsRenderer = createGenericObject({
+    prop: 'map directions',
+    constructor: true
+  });
+
   maps.LatLng = function (lat, lng) {
 
     this.lat = function () {
