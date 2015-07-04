@@ -675,7 +675,7 @@
       });
     }])
 
-    .directive('gmInfowindow', ['$parse', 'gmOverlayBuilder', function ($parse, gmOverlayBuilder) {
+    .directive('gmInfowindow', ['$parse', 'gmOverlayBuilder', 'gmTools', function ($parse, gmOverlayBuilder, gmTools) {
       return gmOverlayBuilder.builder({
         directive: 'gmInfowindow',
         require: ['^?gmMarker'],
@@ -691,16 +691,36 @@
         create: function (scope, element, attrs, controllers, options, create) {
           var infowindowController = controllers[0],
             markerController = controllers[1],
-            mapController = controllers[2];
+            mapController = controllers[2],
 
-          (markerController || mapController).then(function () {
-            create(options);
-            if (!attrs.ngShow && !attrs.ngHide) { // visibility is not handled, so, we need to open it
-              infowindowController.then(function (infowindow) {
-                infowindow.open(mapController.get(), markerController ? markerController.get() : null);
-              });
-            }
-          });
+            payload = function (options) {
+              create(options);
+              if (!attrs.ngShow && !attrs.ngHide) { // visibility is not handled, so, we need to open it
+                infowindowController.then(function (infowindow) {
+                  infowindow.open(mapController.get(), markerController ? markerController.get() : null);
+                });
+              }
+            };
+
+          if (markerController) {
+            markerController.then(function () {
+              payload(options);
+            });
+          } else { // infowindow needs a position
+            gmTools.wait(
+              scope,
+              attrs,
+              controllers[0],
+              'position',
+              function (options) {
+                options.position = toLatLng(options.position);
+                payload(options);
+                gmTools.prop(scope, attrs, controllers[0], 'position', toLatLng);
+              },
+              true
+            );
+
+          }
           return true;
         },
         visibility: function (scope, element, attrs, controllers, value) {
