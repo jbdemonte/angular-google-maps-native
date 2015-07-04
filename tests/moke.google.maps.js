@@ -132,5 +132,14 @@ var google = (function () {
   }());
 
 
+  maps.DirectionsService = function () {
+    this.route = function (options, callback) {
+      setTimeout(function () {
+        callback({options: options}, 'status');
+      });
+    }
+  };
+
+
   return {maps: maps}
 }());
