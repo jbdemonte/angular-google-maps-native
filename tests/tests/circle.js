@@ -40,16 +40,14 @@ describe('gmCircle', function () {
     expect(scope.map instanceof googleMaps.Map).to.be.equal(true);
     expect(scope.circle instanceof googleMaps.Circle).to.be.equal(true);
     expect(scope.circle.getMap() === scope.map).to.be.equal(true);
-    expect(scope.circle.getCenter().lat()).to.be.equal(1);
-    expect(scope.circle.getCenter().lng()).to.be.equal(2);
+    testTools.test.latLng(scope.circle.getCenter(), 1, 2);
   });
 
   it('use map.center', function () {
     compile('<gm-circle options="{center: map.getCenter()}"></gm-circle>');
     expect(scope.map instanceof googleMaps.Map).to.be.equal(true);
     expect(scope.circle instanceof googleMaps.Circle).to.be.equal(true);
-    expect(scope.circle.getCenter().lat()).to.be.equal(scope.map.getCenter().lat());
-    expect(scope.circle.getCenter().lng()).to.be.equal(scope.map.getCenter().lng());
+    testTools.test.latLng(scope.circle.getCenter(), scope.map.getCenter());
   });
 
 
@@ -60,8 +58,7 @@ describe('gmCircle', function () {
     $scope.pos = [1, 2];
     $scope.$digest();
     expect(scope.circle instanceof googleMaps.Circle).to.be.equal(true);
-    expect(scope.circle.getCenter().lat()).to.be.equal(1);
-    expect(scope.circle.getCenter().lng()).to.be.equal(2);
+    testTools.test.latLng(scope.circle.getCenter(), 1, 2);
   });
 
   it('test events', function () {

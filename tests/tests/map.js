@@ -58,8 +58,7 @@ describe('gmMap', function () {
     $timeout.flush();
 
     expect(scope.map instanceof googleMaps.Map).to.be.equal(true);
-    expect(scope.map.__data.center.lat()).to.be.equal($scope.center[0]);
-    expect(scope.map.__data.center.lng()).to.be.equal($scope.center[1]);
+    testTools.test.latLng(scope.map.getCenter(), $scope.center);
   });
 
 
@@ -76,8 +75,7 @@ describe('gmMap', function () {
     $scope.$digest();
 
     expect(scope.map.getCenter() instanceof googleMaps.LatLng).to.be.equal(true);
-    expect(scope.map.getCenter().lat()).to.be.equal($scope.center[0]);
-    expect(scope.map.getCenter().lng()).to.be.equal($scope.center[1]);
+    testTools.test.latLng(scope.map.getCenter(), $scope.center);
 
 
     $scope.mapTypeId = "xxx";

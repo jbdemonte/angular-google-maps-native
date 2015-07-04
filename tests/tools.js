@@ -51,9 +51,21 @@ var testTools = {
   },
 
   test: {
-    latLng: function (latLng, lat, lng) {
-      expect(latLng.lat()).to.be.equal(lat);
-      expect(latLng.lng()).to.be.equal(lng);
+    /**
+     * Test a LatLng
+     * @param latLng {google.maps.LatLng}
+     * @param mixedLat {Number|google.maps.LatLng|Array}
+     * @param lng {number} optional
+     */
+    latLng: function (latLng, mixedLat, lng) {
+      if (angular.isArray(mixedLat)) {
+        testTools.test.latLng(latLng, mixedLat[0], mixedLat[1]);
+      } else if (mixedLat instanceof google.maps.LatLng) {
+        testTools.test.latLng(latLng, mixedLat.lat(), mixedLat.lng());
+      } else {
+        expect(latLng.lat()).to.be.equal(mixedLat);
+        expect(latLng.lng()).to.be.equal(lng);
+      }
     },
     latLngBounds: function (latLngBounds, n, e, s, w) {
       expect(latLngBounds.ne().lat()).to.be.equal(n);

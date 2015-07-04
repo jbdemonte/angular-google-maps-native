@@ -40,16 +40,14 @@ describe('gmMarker', function () {
     expect(scope.map instanceof googleMaps.Map).to.be.equal(true);
     expect(scope.marker instanceof googleMaps.Marker).to.be.equal(true);
     expect(scope.marker.getMap() === scope.map).to.be.equal(true);
-    expect(scope.marker.getPosition().lat()).to.be.equal(1);
-    expect(scope.marker.getPosition().lng()).to.be.equal(2);
+    testTools.test.latLng(scope.marker.getPosition(), 1, 2);
   });
 
   it('use map.center', function () {
     compile('<gm-marker options="{position: map.getCenter()}"></gm-marker>');
     expect(scope.map instanceof googleMaps.Map).to.be.equal(true);
     expect(scope.marker instanceof googleMaps.Marker).to.be.equal(true);
-    expect(scope.marker.getPosition().lat()).to.be.equal(scope.map.getCenter().lat());
-    expect(scope.marker.getPosition().lng()).to.be.equal(scope.map.getCenter().lng());
+    testTools.test.latLng(scope.marker.getPosition(), scope.map.getCenter());
   });
 
   it('wait for position', function () {
@@ -59,8 +57,7 @@ describe('gmMarker', function () {
     $scope.pos = [1, 2];
     $scope.$digest();
     expect(scope.marker instanceof googleMaps.Marker).to.be.equal(true);
-    expect(scope.marker.getPosition().lat()).to.be.equal(1);
-    expect(scope.marker.getPosition().lng()).to.be.equal(2);
+    testTools.test.latLng(scope.marker.getPosition(), 1, 2);
   });
 
   it('test events', function () {
