@@ -37,7 +37,7 @@ describe('gmDirections', function () {
   }
 
   it('test simple case', function (done) {
-    compile('<gm-directions destination="destination" options="{origin: \'from\', destination: \'to\', travelMode: \'mode\'}"></gm-directions>');
+    compile('<gm-directions options="{origin: \'from\', destination: \'to\', travelMode: \'mode\'}"></gm-directions>');
 
     setTimeout(function() {
       expect(scope.directions).not.to.be.an('undefined');
