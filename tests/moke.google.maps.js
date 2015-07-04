@@ -52,6 +52,11 @@ var google = (function () {
     constructor: true
   });
 
+  maps.Circle = createGenericObject({
+    prop: 'bounds center draggable editable map radius visible',
+    constructor: true
+  });
+
   maps.LatLng = function (lat, lng) {
 
     this.lat = function () {
