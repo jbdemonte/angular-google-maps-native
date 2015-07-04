@@ -14,7 +14,13 @@ var google = (function () {
         return this.__data[name];
       };
       if (options.constructor) {
-        options.constructor.apply(this, arguments)
+        if (options.constructor === true) { // generic: function (options) { }
+          if (angular.isObject(arguments[0])) {
+            angular.extend(this.__data, arguments[0]);
+          }
+        } else {
+          options.constructor.apply(this, arguments)
+        }
       }
     }
 
@@ -42,7 +48,8 @@ var google = (function () {
   });
 
   maps.Marker = createGenericObject({
-    prop: 'animation attribution clickable cursor draggable icon map opacity place position shape title visible zIndex'
+    prop: 'animation attribution clickable cursor draggable icon map opacity place position shape title visible zIndex',
+    constructor: true
   });
 
   maps.LatLng = function (lat, lng) {
