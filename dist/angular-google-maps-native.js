@@ -474,7 +474,6 @@
                 gmTools.prop(scope, attrs, controller, 'heading tilt zoom', function (value) {
                   return 1 * value;
                 });
-                gmTools.prop(scope, attrs, controller, 'mapTypeId');
               },
               true // once only
             );
@@ -684,7 +683,7 @@
       });
     }])
 
-    .directive('gmInfowindow', ['$parse', 'gmOverlayBuilder', function ($parse, gmOverlayBuilder) {
+    .directive('gmInfowindow', ['$parse', 'gmOverlayBuilder', 'gmTools', function ($parse, gmOverlayBuilder, gmTools) {
       return gmOverlayBuilder.builder({
         directive: 'gmInfowindow',
         require: ['^?gmMarker'],
@@ -698,14 +697,39 @@
           infowindow.close();
         },
         create: function (scope, element, attrs, controllers, options, create) {
-          if (controllers[1]) { // marker controller
-            controllers[1].then(function (marker) {
-              options.anchor = marker;
+          var infowindowController = controllers[0],
+            markerController = controllers[1],
+            mapController = controllers[2],
+
+            payload = function (options) {
               create(options);
+              if (!attrs.ngShow && !attrs.ngHide) { // visibility is not handled, so, we need to open it
+                infowindowController.then(function (infowindow) {
+                  infowindow.open(mapController.get(), markerController ? markerController.get() : null);
+                });
+              }
+            };
+
+          if (markerController) {
+            markerController.then(function () {
+              payload(options);
             });
-            return true;
+          } else { // infowindow needs a position
+            gmTools.wait(
+              scope,
+              attrs,
+              controllers[0],
+              'position',
+              function (options) {
+                options.position = toLatLng(options.position);
+                payload(options);
+                gmTools.prop(scope, attrs, controllers[0], 'position', toLatLng);
+              },
+              true
+            );
+
           }
-          return false;
+          return true;
         },
         visibility: function (scope, element, attrs, controllers, value) {
           /*
