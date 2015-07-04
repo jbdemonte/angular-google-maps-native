@@ -18,7 +18,7 @@ layout: api
 </p>
 <pre class="code"><code class="language-markup">&lt;gm-map options="{center: [37, -122], zoom: 8, mapTypeId: google.maps.MapTypeId.ROADMAP}"&gt;&lt;/gm-map&gt;</code></pre>
 <p>
-  Each directive use a child scope which provides its own google maps native object.<br />
+  Each directive uses a child scope which provides its own google maps native object.<br />
   e.g. In the HTML structure:
 </p>
 <ul>
@@ -40,7 +40,7 @@ layout: api
 <p>
   All <a href="https://developers.google.com/maps/documentation/javascript/events" target="_blank">events</a> are directly usable in the directive with the prefix <em>on</em> (addListener) or <em>once</em> (addListenerOnce).
   <br />
-  They use a child scope not isolated which provides an <em>event</em> object whose depends on the event type (see google documentation).
+  They use a not isolated child scope, which provides an <em>event</em> object, that depends on the event type (see google documentation).
 </p>
 <params>
   <item name="event" type="object,none">Depends on event type (e.g. <doc>MouseEvent</doc>).</item>
