@@ -14,8 +14,8 @@ module.exports = function(config) {
     files: [
       'node_modules/angular/angular.js',
       'node_modules/angular-mocks/angular-mocks.js',
-      //'dist/angular-google-maps-native.js',
-      'dist/angular-google-maps-native.min.js',
+      'src/angular-google-maps-native.js',
+      //'dist/angular-google-maps-native.min.js',
       'tests/moke.google.maps.js',
       'tests/tools.js',
       'tests/**/*.js'
