@@ -62,6 +62,21 @@ var google = (function () {
     constructor: true
   });
 
+  maps.InfoWindow = createGenericObject({
+    prop: 'content position zIndex',
+    constructor: true
+  });
+
+  maps.InfoWindow.prototype.open = function (map, anchor) {
+    this.__data.__map = map;
+    this.__data.__anchor = anchor;
+    this.__data.__opened = true;
+  };
+
+  maps.InfoWindow.prototype.close = function () {
+    this.__data.__opened = false;
+  };
+
   maps.LatLng = function (lat, lng) {
 
     this.lat = function () {
