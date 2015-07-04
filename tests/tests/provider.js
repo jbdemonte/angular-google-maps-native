@@ -88,13 +88,6 @@ describe('Provider', function () {
     // load not yet simulated
     expect(called).to.be.equal(false);
 
-    // simulate global object
-    $window.google = {
-      maps: {
-        foo: 'bar'
-      }
-    };
-
     expect($window.__callback).not.to.be.an('undefined');
 
     // simulate load end
