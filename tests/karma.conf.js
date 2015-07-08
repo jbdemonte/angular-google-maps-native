@@ -14,8 +14,8 @@ module.exports = function(config) {
     files: [
       'node_modules/angular/angular.js',
       'node_modules/angular-mocks/angular-mocks.js',
-      //'dist/angular-google-maps-native.js',
-      'dist/angular-google-maps-native.min.js',
+      'dist/angular-google-maps-native.js',
+      //'dist/angular-google-maps-native.min.js',
       'tests/moke.google.maps.js',
       'tests/tools.js',
       'tests/**/*.js'
@@ -30,7 +30,7 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      'dist/angular-google-maps-native.min.js': ['coverage']
+      'dist/angular-google-maps-native.js': ['coverage']
     },
 
     coverageReporter: {
