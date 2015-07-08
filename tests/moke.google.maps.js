@@ -97,6 +97,11 @@ var google = (function () {
     constructor: true
   });
 
+  maps.BicyclingLayer = createGenericObject({
+    prop: 'map',
+    constructor: true
+  });
+
   maps.LatLng = function (lat, lng) {
 
     this.lat = function () {

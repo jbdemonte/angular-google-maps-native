@@ -870,20 +870,42 @@
       });
     }])
 
-    .directive('gmTrafficlayer', ['gmOverlayBuilder', function (gmOverlayBuilder) {
-      return gmOverlayBuilder.builder({
+    .service('gmLayerBuilder', ['gmOverlayBuilder', function (gmOverlayBuilder) {
+      return {
+        builder: function (buildOptions) {
+          return gmOverlayBuilder.builder(
+            angular.extend(
+              {
+                create: function (scope, element, attrs, controllers, options, create) {
+                  if (!attrs.ngShow && !attrs.ngHide) { // visibility is not handled, so, we need to display it after creation
+                    controllers[0].then(function (layer) {
+                      layer.setMap(controllers[1].get());
+                    });
+                  }
+                  create(options);
+                  return true;
+                }
+              },
+              buildOptions
+            )
+          );
+        }
+      }
+    }])
+
+    .directive('gmTrafficlayer', ['gmLayerBuilder', function (gmLayerBuilder) {
+      return gmLayerBuilder.builder({
         directive: 'gmTrafficlayer',
         name: 'trafficLayer',
-        cls: 'TrafficLayer',
-        create: function (scope, element, attrs, controllers, options, create) {
-          if (!attrs.ngShow && !attrs.ngHide) { // visibility is not handled, so, we need to display it after creation
-            controllers[0].then(function (layer) {
-              layer.setMap(controllers[1].get());
-            });
-          }
-          create(options);
-          return true;
-        }
+        cls: 'TrafficLayer'
+      });
+    }])
+
+    .directive('gmBicyclinglayer', ['gmLayerBuilder', function (gmLayerBuilder) {
+      return gmLayerBuilder.builder({
+        directive: 'gmBicyclinglayer',
+        name: 'bicyclingLayer',
+        cls: 'BicyclingLayer'
       });
     }])
 
