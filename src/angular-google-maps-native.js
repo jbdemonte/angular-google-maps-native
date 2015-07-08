@@ -848,6 +848,23 @@
       });
     }])
 
+    .directive('gmPolygon', ['gmOverlayBuilder', function (gmOverlayBuilder) {
+      return gmOverlayBuilder.builder({
+        directive: 'gmPolygon',
+        name: 'polygon',
+        cls: 'Polygon',
+        main: {
+          name: 'paths',
+          cast: function (paths) {
+            angular.forEach(paths, function (value, index) {
+              paths[index] = toLatLng(value);
+            });
+            return paths;
+          }
+        }
+      });
+    }])
+
   ;
 
 }(angular));

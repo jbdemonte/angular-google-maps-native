@@ -72,6 +72,11 @@ var google = (function () {
     constructor: true
   });
 
+  maps.Polygon = createGenericObject({
+    prop: 'draggable editable map path paths visible',
+    constructor: true
+  });
+
   maps.InfoWindow.prototype.open = function (map, anchor) {
     this.__data.__map = map;
     this.__data.__anchor = anchor;
