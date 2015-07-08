@@ -22,6 +22,7 @@
   },
   "ignore": [
     "*.json",
+    "assets",
     "examples",
     "src",
     "gulpfile.js",
