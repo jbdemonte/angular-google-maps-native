@@ -51,7 +51,7 @@
 
   /**
    * Convert mixed bounds to google.maps.LatLngBounds (NE, SW)
-   * [LatLng, LatLng], [lat 1, lng 1, lat 2, lng 2], {ne: LatLng, sw: LatLng}, {n:number, e:number, s:number, w:number}
+   * [LatLng, LatLng], [lat 1, lng 1, lat 2, lng 2], [latLng1, latLng2], {ne: LatLng, sw: LatLng}, {n:number, e:number, s:number, w:number}
    * @param mixed {*}
    * @returns {*}
    */
