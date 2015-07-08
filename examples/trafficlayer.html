@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html ng-app="MyApp">
+<head lang="en">
+  <meta charset="UTF-8">
+  <link rel="stylesheet" type="text/css" href="assets/style.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+  <script src="../src/angular-google-maps-native.js"></script>
+  <script>
+    angular.module('MyApp', ['GoogleMapsNative']);
+  </script>
+</head>
+<body ng-init="showTrafficLayer=true">
+  <div class="panel">
+    <div class="item">
+      <label>
+        <input type="checkbox" ng-model="showTrafficLayer"> Show the TrafficLayer
+      </label>
+    </div>
+  </div>
+
+  <gm-map options="{center: [34.04924594193164, -118.24104309082031], zoom: 13}">
+    <gm-trafficLayer ng-show="showTrafficLayer"></gm-trafficLayer>
+  </gm-map>
+
+</body>
+</html>

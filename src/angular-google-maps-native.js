@@ -540,8 +540,15 @@
               /**
                * Create the object
                */
-              this._build = once(function (options) {
+              this._build = once(function (options, map, visible) {
+                if (!visible && options.map) {
+                  delete options.map;
+                }
                 obj = new googleMap[buildOptions.cls](options);
+                // some objects does not use "map" from options and need to use a setMap instead of options.map
+                if (visible && !options.map && obj.setMap) {
+                  obj.setMap(map);
+                }
                 if (buildOptions.name) {
                   $scope[buildOptions.name] = obj;
                 }
@@ -573,7 +580,8 @@
                * Finalise object creation and bind visibility if needed
                */
               function create(options) {
-                var visibility = getVisibility(attrs);
+                var visibility = getVisibility(attrs),
+                  map = mapController.get();
 
                 // if map visibility is dynamic, evaluate it
                 if (visibility) {
@@ -583,20 +591,17 @@
                       if (buildOptions.visibility) {
                         buildOptions.visibility(scope, element, attrs, controllers, value);
                       } else {
-                        obj.setMap(value ? mapController.get() : null);
+                        obj.setMap(value ? map : null);
                       }
                     } else {
-                      if (!value && options.map) {
-                        delete options.map;
-                      }
-                      controller._build(options);
+                      controller._build(options, map, value);
                       if (buildOptions.visibility) {
                         buildOptions.visibility(scope, element, attrs, controllers, value);
                       }
                     }
                   });
                 } else {
-                  controller._build(options);
+                  controller._build(options, map, true);
                 }
               }
 
@@ -861,6 +866,23 @@
             });
             return paths;
           }
+        }
+      });
+    }])
+
+    .directive('gmTrafficlayer', ['gmOverlayBuilder', function (gmOverlayBuilder) {
+      return gmOverlayBuilder.builder({
+        directive: 'gmTrafficlayer',
+        name: 'trafficLayer',
+        cls: 'TrafficLayer',
+        create: function (scope, element, attrs, controllers, options, create) {
+          if (!attrs.ngShow && !attrs.ngHide) { // visibility is not handled, so, we need to display it after creation
+            controllers[0].then(function (layer) {
+              layer.setMap(controllers[1].get());
+            });
+          }
+          create(options);
+          return true;
         }
       });
     }])
