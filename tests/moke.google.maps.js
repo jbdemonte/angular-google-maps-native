@@ -67,6 +67,11 @@ var google = (function () {
     constructor: true
   });
 
+  maps.Polyline = createGenericObject({
+    prop: 'draggable editable map path visible',
+    constructor: true
+  });
+
   maps.InfoWindow.prototype.open = function (map, anchor) {
     this.__data.__map = map;
     this.__data.__anchor = anchor;

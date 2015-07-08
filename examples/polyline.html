@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html ng-app="MyApp">
+<head lang="en">
+  <meta charset="UTF-8">
+  <link rel="stylesheet" type="text/css" href="assets/style.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+  <script src="../src/angular-google-maps-native.js"></script>
+  <script>angular.module('MyApp', ['GoogleMapsNative']);</script>
+</head>
+<body>
+
+  <gm-map options="{center: [0, -180], zoom: 2}">
+    <gm-polyline options="{strokeColor: '#FF0000', strokeOpacity: 1.0, strokeWeight: 2, path:[[37.772323, -122.214897], [21.291982, -157.821856], [-18.142599, 178.431], [-27.46758, 153.027892]]}"></gm-polyline>
+  </gm-map>
+
+</body>
+</html>

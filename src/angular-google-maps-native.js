@@ -831,6 +831,23 @@
       });
     }])
 
+    .directive('gmPolyline', ['gmOverlayBuilder', function (gmOverlayBuilder) {
+      return gmOverlayBuilder.builder({
+        directive: 'gmPolyline',
+        name: 'polyline',
+        cls: 'Polyline',
+        main: {
+          name: 'path',
+          cast: function (path) {
+            angular.forEach(path, function (value, index) {
+              path[index] = toLatLng(value);
+            });
+            return path;
+          }
+        }
+      });
+    }])
+
   ;
 
 }(angular));
