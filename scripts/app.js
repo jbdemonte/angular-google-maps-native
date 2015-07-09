@@ -71,5 +71,14 @@ angular.module('project', ['Snippets', 'SnippetsThemeBootstrapButtons'])
     };
   })
 
+.directive('version', function () {
+    return {
+      restrict: 'A',
+      link: function (scope, element, attrs) {
+        element.append('<version>new in v' + attrs.version + '</version>');
+      }
+    };
+  })
+
 
 ;
