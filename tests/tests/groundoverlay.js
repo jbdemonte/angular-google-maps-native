@@ -1,4 +1,4 @@
-describe('gmGroundOverlay', function () {
+describe('gmGroundoverlay', function () {
 
   var $compile, $rootScope, $scope, $timeout,
     element, scope, googleMaps;
