@@ -1,0 +1,20 @@
+---
+layout: api-snippets
+---
+{% raw %}
+<body ng-init="showTrafficLayer=true">
+
+<div class="panel">
+  <div class="item">
+    <label>
+      <input type="checkbox" ng-model="showTrafficLayer"> Show the TrafficLayer
+    </label>
+  </div>
+</div>
+
+<gm-map options="{center: [34.04924594193164, -118.24104309082031], zoom: 13}">
+  <gm-trafficLayer ng-show="showTrafficLayer"></gm-trafficLayer>
+</gm-map>
+
+</body>
+{% endraw %}
