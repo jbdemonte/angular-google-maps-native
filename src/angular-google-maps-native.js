@@ -485,6 +485,7 @@
          *          .main       {object}    (optional) main property to to wait / watch / observe before creating object
          *            .name     {string}    property name
          *            .cast     {function}  (optional) preprocess value
+         *          .opts       {boolean}   use a subobject (opts) as options constructor (default = false)
          *          .require    {array|string} additional constructor to require
          *          .destroy    {function(scope, element, attrs, object)} kinda destructor
          *          .create     {function(scope, element, attrs, controllers, options, create)} kinda constructor
@@ -547,12 +548,13 @@
                * Create the object
                */
               this._build = once(function (options, map, visible) {
-                if (!visible && options.map) {
-                  delete options.map;
+                var opts = buildOptions.opts ? options.opts || {} : options;
+                if (!visible && opts.map) {
+                  delete opts.map;
                 }
                 obj = buildOptions.instantiate ? buildOptions.instantiate($scope, $element, $attrs, options) : new googleMap[buildOptions.cls](options);
                 // some objects does not use "map" from options and need to use a setMap instead of options.map
-                if (visible && !options.map && obj.setMap) {
+                if (visible && !opts.map && obj.setMap) {
                   obj.setMap(map);
                 }
                 if (buildOptions.name) {
@@ -638,7 +640,12 @@
                     if (buildOptions.main.cast) {
                       options[buildOptions.main.name] = buildOptions.main.cast(options[buildOptions.main.name]);
                     }
-                    options.map = map;
+                    if (buildOptions.opts) {
+                      options.opts = options.opts || {};
+                      options.opts.map = map;
+                    } else {
+                      options.map = map;
+                    }
                     create(options);
                     gmTools.prop(scope, attrs, controller, buildOptions.main.name, buildOptions.main.cast);
                   }
@@ -881,6 +888,7 @@
         directive: 'gmGroundoverlay',
         name: 'groundOverlay',
         cls: 'GroundOverlay',
+        opts: true,
         instantiate: function (scope, element, attrs, options) {
           return new googleMap.GroundOverlay(options.url, options.bounds, options.opts);
         },
@@ -899,6 +907,21 @@
             );
           });
           return true;
+        }
+      });
+    }])
+
+    .directive('gmKmllayer', ['$parse', 'gmOverlayBuilder', function ($parse, gmOverlayBuilder) {
+      return gmOverlayBuilder.builder({
+        directive: 'gmKmllayer',
+        name: 'kmlLayer',
+        cls: 'KmlLayer',
+        opts: true,
+        main: {
+          name: 'url'
+        },
+        instantiate: function (scope, element, attrs, options) {
+          return new googleMap.KmlLayer(options.url, options.opts);
         }
       });
     }])

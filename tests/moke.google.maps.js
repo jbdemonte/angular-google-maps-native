@@ -116,6 +116,14 @@ var google = (function () {
     }
   });
 
+  maps.KmlLayer = createGenericObject({
+    prop: 'defaultViewport:get map metadata:get status:get url zIndex',
+    constructor: function (url, options) {
+      this.__data.url = url;
+      angular.extend(this.__data, options);
+    }
+  });
+
   maps.LatLng = function (lat, lng) {
 
     this.lat = function () {
