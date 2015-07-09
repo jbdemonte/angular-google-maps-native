@@ -1,0 +1,46 @@
+---
+layout: api
+---
+
+<h2 version="1.2.0">gm-groundOverlay</h2>
+
+<strong>Parent</strong>
+<ul><li><a href="api-gmMap.html">map</a></li></ul>
+
+<strong>Scope</strong>
+<params>
+  <item name="kmlLayer" type="object">
+    <doc>GroundOverlay</doc>
+  </item>
+</params>
+
+<strong>Parameters</strong>
+<params>
+  <item name="options" type="object" optional>
+    <a href="#Options">Options</a>
+  </item>
+  <item name="url" type="expression" optional>
+    image URL.
+  </item>
+  <item name="bounds" type="expression" optional>
+    <a href="api.html#api-latlngbounds">LatLngBounds</a> of the image.
+  </item>
+</params>
+
+<strong id="Options">Options</strong>
+<params>
+  <item name="url" type="string" optional>
+    image URL.
+  </item>
+  <item name="bounds" type="object" optional>
+    <a href="api.html#api-latlngbounds">LatLngBounds</a> of the image.
+  </item>
+  <item name="opts" type="object">
+    <doc>GroundOverlayOptions</doc>
+  </item>
+</params>
+
+
+<strong>Example:</strong>
+
+<snippets path="snippets/api-groundOverlay"></snippets>
