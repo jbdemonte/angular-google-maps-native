@@ -26,13 +26,18 @@ var google = (function () {
 
     // append getter / setter for property list
     angular.forEach((options.prop || '').split(' '), function (feature) {
-      var uc = ucfirst(feature);
-      F.prototype['set' + uc] = function (value) {
-        this.__data[feature] = value;
-      };
-      F.prototype['get' + uc] = function () {
-        return this.__data[feature];
-      };
+      var spl = feature.split(':'),
+        uc = ucfirst(spl[0]);
+      if ( (spl.length === 1) || (spl.indexOf('set') > 0) ) {
+        F.prototype['set' + uc] = function (value) {
+          this.__data[spl[0]] = value;
+        };
+      }
+      if ( (spl.length === 1) || (spl.indexOf('get') > 0) ) {
+        F.prototype['get' + uc] = function () {
+          return this.__data[spl[0]];
+        };
+      }
     });
     return F;
   }
@@ -100,6 +105,15 @@ var google = (function () {
   maps.BicyclingLayer = createGenericObject({
     prop: 'map',
     constructor: true
+  });
+
+  maps.GroundOverlay = createGenericObject({
+    prop: 'bounds:get map opacity url:get',
+    constructor: function (url, bounds, options) {
+      this.__data.url = url;
+      this.__data.bounds = bounds;
+      angular.extend(this.__data, options);
+    }
   });
 
   maps.LatLng = function (lat, lng) {

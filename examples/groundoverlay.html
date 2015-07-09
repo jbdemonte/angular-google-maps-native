@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html ng-app="MyApp">
+<head lang="en">
+  <meta charset="UTF-8">
+  <link rel="stylesheet" type="text/css" href="assets/style.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+  <script src="../dist/angular-google-maps-native.min.js"></script>
+  <script>
+    angular.module('MyApp', ['GoogleMapsNative']);
+  </script>
+</head>
+<body ng-init="showGroundOverlay=true">
+  <div class="panel">
+    <div class="item">
+      <label>
+        <input type="checkbox" ng-model="showGroundOverlay"> Show the GroundOverlay
+      </label>
+    </div>
+  </div>
+
+  <gm-map options="{center: [40.740,-74.18], zoom: 12}">
+    <gm-groundOverlay ng-show="showGroundOverlay" options="{url:'http://www.lib.utexas.edu/maps/historical/newark_nj_1922.jpg', bounds:{ne:{lat:40.765641, lng:-74.139235}, sw:{lat:40.716216, lng:-74.213393}}, opts: {opacity:0.8}}"></gm-groundOverlay>
+  </gm-map>
+
+</body>
+</html>

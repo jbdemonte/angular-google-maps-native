@@ -495,6 +495,12 @@
          *                        @param options      {object}
          *                        @param create       {function(options)} creating callback to finalize object creation
          *                        @return {boolean} true => processing, false => continue classic creating process
+         *          .instantiate  {function(scope, element, attrs, options)} low level google.maps.Object instantiation
+         *                        @param scope
+         *                        @param element
+         *                        @param attrs
+         *                        @param options
+         *                        @return {Object}
          *          .visibility {function(scope, element, attrs, controllers, value)} toggle visibility handler
          *                        @param scope
          *                        @param element
@@ -544,7 +550,7 @@
                 if (!visible && options.map) {
                   delete options.map;
                 }
-                obj = new googleMap[buildOptions.cls](options);
+                obj = buildOptions.instantiate ? buildOptions.instantiate($scope, $element, $attrs, options) : new googleMap[buildOptions.cls](options);
                 // some objects does not use "map" from options and need to use a setMap instead of options.map
                 if (visible && !options.map && obj.setMap) {
                   obj.setMap(map);
@@ -866,6 +872,33 @@
             });
             return paths;
           }
+        }
+      });
+    }])
+
+    .directive('gmGroundoverlay', ['$parse', 'gmOverlayBuilder', 'gmTools', function ($parse, gmOverlayBuilder, gmTools) {
+      return gmOverlayBuilder.builder({
+        directive: 'gmGroundoverlay',
+        name: 'groundOverlay',
+        cls: 'GroundOverlay',
+        instantiate: function (scope, element, attrs, options) {
+          return new googleMap.GroundOverlay(options.url, options.bounds, options.opts);
+        },
+        create: function (scope, element, attrs, controllers, options, create) {
+          controllers[1].then(function () { // mapController
+            gmTools.wait(
+              scope,
+              attrs,
+              controllers[0], // current controller
+              'url bounds',
+              function (options) {
+                options.bounds = toLatLngBounds(options.bounds);
+                create(options); // will handle the setMap
+              },
+              true // once only
+            );
+          });
+          return true;
         }
       });
     }])
