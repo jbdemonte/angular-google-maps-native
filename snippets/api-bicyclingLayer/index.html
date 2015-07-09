@@ -1,0 +1,20 @@
+---
+layout: api-snippets
+---
+{% raw %}
+<body ng-init="showBicyclingLayer=true">
+
+<div class="panel">
+  <div class="item">
+    <label>
+      <input type="checkbox" ng-model="showBicyclingLayer"> Show the BicyclingLayer
+    </label>
+  </div>
+</div>
+
+<gm-map options="{center: [42.3726399,-71.1096528], zoom: 14}">
+  <gm-bicyclingLayer ng-show="showBicyclingLayer"></gm-bicyclingLayer>
+</gm-map>
+
+</body>
+{% endraw %}
