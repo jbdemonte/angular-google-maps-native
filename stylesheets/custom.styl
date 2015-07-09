@@ -36,6 +36,11 @@ nav.navbar
       overflow hidden
       background-color #222222
       border-right 1px solid #333333
+@media (max-width: 767px)
+  nav.navbar
+      .divider-vertical
+        display none
+
 
 snippets
   display block
@@ -99,3 +104,22 @@ params
       em
         color #FF6E7E
         font-style normal
+
+
+.page-header
+  position relative
+  .badges
+    position absolute
+    bottom 5px
+    right 5px
+@media screen and (max-width: 64em)
+  .page-header
+    .badges
+      position initial
+@media screen and (max-width: 42em)
+  .page-header
+    .badges
+      text-align right
+      a
+        display block
+

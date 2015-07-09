@@ -42,6 +42,11 @@ nav.navbar #navbar-collapse .divider-vertical {
   background-color: #222;
   border-right: 1px solid #333;
 }
+@media (max-width: 767px) {
+  nav.navbar .divider-vertical {
+    display: none;
+  }
+}
 snippets {
   display: block;
   margin: 10px 0;
@@ -112,4 +117,25 @@ params p.default em {
 params p.example em {
   color: #ff6e7e;
   font-style: normal;
+}
+.page-header {
+  position: relative;
+}
+.page-header .badges {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+}
+@media screen and (max-width: 64em) {
+  .page-header .badges {
+    position: initial;
+  }
+}
+@media screen and (max-width: 42em) {
+  .page-header .badges {
+    text-align: right;
+  }
+  .page-header .badges a {
+    display: block;
+  }
 }
