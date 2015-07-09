@@ -1,0 +1,22 @@
+---
+layout: api-snippets
+---
+{% raw %}
+<body ng-init="showKMLLayer=true">
+<div class="panel">
+  <div class="item">
+    <label>
+      <input type="checkbox" ng-model="showKMLLayer"> Show the KML Layer
+    </label>
+  </div>
+</div>
+
+<gm-map options="{center: [40.740,-74.18], zoom: 12}">
+  <gm-kmlLayer
+    ng-show="showKMLLayer"
+    options="{url:'http://jbdemonte.github.io/angular-google-maps-native/assets/rungis-desc.kml', opts: {suppressInfoWindows: true}}"
+    ></gm-kmlLayer>
+</gm-map>
+
+</body>
+{% endraw %}

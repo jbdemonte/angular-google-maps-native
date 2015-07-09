@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document>
+    <name>KML file with polygon for bird species range</name>
+    <description>Source various books and websites</description>
+    <Style id="rangecolour">
+        <LineStyle>
+            <color>660000FF</color>
+            <width>0.1</width>
+        </LineStyle>
+        <PolyStyle>
+            <color>660000FF</color>
+        </PolyStyle>
+    </Style>
+    <Style id="linecolour">
+        <LineStyle>
+            <color>660000FF</color>
+            <width>3</width>
+        </LineStyle>
+    </Style>
+    <Placemark>
+        <name>Rungis</name>
+        <description>Here is a KML example</description>
+        <styleUrl>#rangecolour</styleUrl>
+        <Polygon>
+	    <description>A plolygon</description>
+            <tessellate>1</tessellate>
+            <altitudeMode>clampToGround</altitudeMode>
+            <outerBoundaryIs>
+                <LinearRing>
+                    <coordinates>
+                        2.346954,48.770062,0 
+                        2.344551,48.764687,0 
+                        2.34498,48.762141,0 
+                        2.348671,48.758067,0 
+                        2.352362,48.754785,0 
+                        2.354422,48.754163,0 
+                        2.358627,48.75405,0 
+                        2.361546,48.754502,0 
+                        2.362833,48.754163,0 
+                        2.366352,48.754106,0 
+                        2.368326,48.755408,0 
+                        2.367983,48.759086,0 
+                        2.366352,48.759199,0 
+                        2.36455,48.759652,0 
+                        2.362747,48.761236,0 
+                        2.3594,48.764404,0 
+                        2.358112,48.765083,0 
+                        2.356739,48.764744,0 
+                        2.351503,48.769496,0 
+                        2.346954,48.770062,0 
+                        2.351933,48.769439,0
+                        2.346954,48.770062,0  
+                    </coordinates>
+                </LinearRing>
+            </outerBoundaryIs>
+        </Polygon>
+    </Placemark>
+</Document>
+</kml>
