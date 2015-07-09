@@ -1,7 +1,7 @@
 /*!
  *  angular-google-maps-native
- *  Version   : 1.1.1
- *  Date      : 2015-07-04
+ *  Version   : 1.2.0
+ *  Date      : 2015-07-09
  *  Author    : DEMONTE Jean-Baptiste
  *  Contact   : jbdemonte@gmail.com
  *  Licence   : GPL v3 : http://www.gnu.org/licenses/gpl.html
@@ -59,7 +59,7 @@
 
   /**
    * Convert mixed bounds to google.maps.LatLngBounds (NE, SW)
-   * [LatLng, LatLng], [lat 1, lng 1, lat 2, lng 2], {ne: LatLng, sw: LatLng}, {n:number, e:number, s:number, w:number}
+   * [LatLng, LatLng], [lat 1, lng 1, lat 2, lng 2], [latLng1, latLng2], {ne: LatLng, sw: LatLng}, {n:number, e:number, s:number, w:number}
    * @param mixed {*}
    * @returns {*}
    */
@@ -493,6 +493,7 @@
          *          .main       {object}    (optional) main property to to wait / watch / observe before creating object
          *            .name     {string}    property name
          *            .cast     {function}  (optional) preprocess value
+         *          .opts       {boolean}   use a subobject (opts) as options constructor (default = false)
          *          .require    {array|string} additional constructor to require
          *          .destroy    {function(scope, element, attrs, object)} kinda destructor
          *          .create     {function(scope, element, attrs, controllers, options, create)} kinda constructor
@@ -503,6 +504,12 @@
          *                        @param options      {object}
          *                        @param create       {function(options)} creating callback to finalize object creation
          *                        @return {boolean} true => processing, false => continue classic creating process
+         *          .instantiate  {function(scope, element, attrs, options)} low level google.maps.Object instantiation
+         *                        @param scope
+         *                        @param element
+         *                        @param attrs
+         *                        @param options
+         *                        @return {Object}
          *          .visibility {function(scope, element, attrs, controllers, value)} toggle visibility handler
          *                        @param scope
          *                        @param element
@@ -548,8 +555,16 @@
               /**
                * Create the object
                */
-              this._build = once(function (options) {
-                obj = new googleMap[buildOptions.cls](options);
+              this._build = once(function (options, map, visible) {
+                var opts = buildOptions.opts ? options.opts || {} : options;
+                if (!visible && opts.map) {
+                  delete opts.map;
+                }
+                obj = buildOptions.instantiate ? buildOptions.instantiate($scope, $element, $attrs, options) : new googleMap[buildOptions.cls](options);
+                // some objects does not use "map" from options and need to use a setMap instead of options.map
+                if (visible && !opts.map && obj.setMap) {
+                  obj.setMap(map);
+                }
                 if (buildOptions.name) {
                   $scope[buildOptions.name] = obj;
                 }
@@ -581,7 +596,8 @@
                * Finalise object creation and bind visibility if needed
                */
               function create(options) {
-                var visibility = getVisibility(attrs);
+                var visibility = getVisibility(attrs),
+                  map = mapController.get();
 
                 // if map visibility is dynamic, evaluate it
                 if (visibility) {
@@ -591,20 +607,17 @@
                       if (buildOptions.visibility) {
                         buildOptions.visibility(scope, element, attrs, controllers, value);
                       } else {
-                        obj.setMap(value ? mapController.get() : null);
+                        obj.setMap(value ? map : null);
                       }
                     } else {
-                      if (!value && options.map) {
-                        delete options.map;
-                      }
-                      controller._build(options);
+                      controller._build(options, map, value);
                       if (buildOptions.visibility) {
                         buildOptions.visibility(scope, element, attrs, controllers, value);
                       }
                     }
                   });
                 } else {
-                  controller._build(options);
+                  controller._build(options, map, true);
                 }
               }
 
@@ -635,7 +648,12 @@
                     if (buildOptions.main.cast) {
                       options[buildOptions.main.name] = buildOptions.main.cast(options[buildOptions.main.name]);
                     }
-                    options.map = map;
+                    if (buildOptions.opts) {
+                      options.opts = options.opts || {};
+                      options.opts.map = map;
+                    } else {
+                      options.map = map;
+                    }
                     create(options);
                     gmTools.prop(scope, attrs, controller, buildOptions.main.name, buildOptions.main.cast);
                   }
@@ -836,6 +854,122 @@
           });
           return true;
         }
+      });
+    }])
+
+    .directive('gmPolyline', ['gmOverlayBuilder', function (gmOverlayBuilder) {
+      return gmOverlayBuilder.builder({
+        directive: 'gmPolyline',
+        name: 'polyline',
+        cls: 'Polyline',
+        main: {
+          name: 'path',
+          cast: function (path) {
+            angular.forEach(path, function (value, index) {
+              path[index] = toLatLng(value);
+            });
+            return path;
+          }
+        }
+      });
+    }])
+
+    .directive('gmPolygon', ['gmOverlayBuilder', function (gmOverlayBuilder) {
+      return gmOverlayBuilder.builder({
+        directive: 'gmPolygon',
+        name: 'polygon',
+        cls: 'Polygon',
+        main: {
+          name: 'paths',
+          cast: function (paths) {
+            angular.forEach(paths, function (value, index) {
+              paths[index] = toLatLng(value);
+            });
+            return paths;
+          }
+        }
+      });
+    }])
+
+    .directive('gmGroundoverlay', ['$parse', 'gmOverlayBuilder', 'gmTools', function ($parse, gmOverlayBuilder, gmTools) {
+      return gmOverlayBuilder.builder({
+        directive: 'gmGroundoverlay',
+        name: 'groundOverlay',
+        cls: 'GroundOverlay',
+        opts: true,
+        instantiate: function (scope, element, attrs, options) {
+          return new googleMap.GroundOverlay(options.url, options.bounds, options.opts);
+        },
+        create: function (scope, element, attrs, controllers, options, create) {
+          controllers[1].then(function () { // mapController
+            gmTools.wait(
+              scope,
+              attrs,
+              controllers[0], // current controller
+              'url bounds',
+              function (options) {
+                options.bounds = toLatLngBounds(options.bounds);
+                create(options); // will handle the setMap
+              },
+              true // once only
+            );
+          });
+          return true;
+        }
+      });
+    }])
+
+    .directive('gmKmllayer', ['$parse', 'gmOverlayBuilder', function ($parse, gmOverlayBuilder) {
+      return gmOverlayBuilder.builder({
+        directive: 'gmKmllayer',
+        name: 'kmlLayer',
+        cls: 'KmlLayer',
+        opts: true,
+        main: {
+          name: 'url'
+        },
+        instantiate: function (scope, element, attrs, options) {
+          return new googleMap.KmlLayer(options.url, options.opts);
+        }
+      });
+    }])
+
+    .service('gmLayerBuilder', ['gmOverlayBuilder', function (gmOverlayBuilder) {
+      return {
+        builder: function (buildOptions) {
+          return gmOverlayBuilder.builder(
+            angular.extend(
+              {
+                create: function (scope, element, attrs, controllers, options, create) {
+                  if (!attrs.ngShow && !attrs.ngHide) { // visibility is not handled, so, we need to display it after creation
+                    controllers[0].then(function (layer) {
+                      layer.setMap(controllers[1].get());
+                    });
+                  }
+                  create(options);
+                  return true;
+                }
+              },
+              buildOptions
+            )
+          );
+        }
+      }
+    }])
+
+    .directive('gmTrafficlayer', ['gmLayerBuilder', function (gmLayerBuilder) {
+      return gmLayerBuilder.builder({
+        directive: 'gmTrafficlayer',
+        name: 'trafficLayer',
+        cls: 'TrafficLayer'
+      });
+    }])
+
+    .directive('gmBicyclinglayer', ['gmLayerBuilder', function (gmLayerBuilder) {
+      return gmLayerBuilder.builder({
+        directive: 'gmBicyclinglayer',
+        name: 'bicyclingLayer',
+        cls: 'BicyclingLayer'
       });
     }])
 
