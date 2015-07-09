@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html ng-app="MyApp">
+<head lang="en">
+  <meta charset="UTF-8">
+  <link rel="stylesheet" type="text/css" href="assets/style.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+  <script src="../dist/angular-google-maps-native.min.js"></script>
+  <script src="assets/tools.js"></script>
+  <script>
+    angular.module('MyApp', ['GoogleMapsNative', 'ExampleTools'])
+
+        .controller('MyCtrl', function ($scope, console) {
+          $scope.console = console;
+        })
+    ;
+  </script>
+</head>
+
+<body ng-controller="MyCtrl" ng-init="showKMLLayer=true">
+  <div class="panel">
+    <div class="item">
+      <label>
+        <input type="checkbox" ng-model="showKMLLayer"> Show the KML Layer
+      </label>
+    </div>
+  </div>
+
+  <gm-map options="{center: [40.740,-74.18], zoom: 12}">
+    <gm-kmlLayer
+      ng-show="showKMLLayer"
+      options="{url:'http://jbdemonte.github.io/angular-google-maps-native/assets/rungis-desc.kml', opts: {suppressInfoWindows: true}}"
+      on-click="console.log('click on {' + event.latLng.lat() + ',' + event.latLng.lng() + '}')"
+    ></gm-kmlLayer>
+  </gm-map>
+
+  <console></console>
+
+</body>
+</html>
