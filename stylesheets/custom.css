@@ -98,9 +98,18 @@ pre.code {
 }
 #api-summary li {
   list-style: none;
+  max-width: 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 #api-summary li ul {
   padding-left: 10px;
+}
+@media screen and (max-width: 600px) {
+  #api-summary {
+    font-size: 12px;
+  }
 }
 params {
   margin: 10px 0;
