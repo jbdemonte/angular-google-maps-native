@@ -21,6 +21,25 @@ layout: api
   </item>
 </params>
 
+<strong class="danger">
+  Trying to use DOM node in AngularJS expression throw the error: <br/>
+  <a href="https://docs.angularjs.org/error/$parse/isecdom" target="_blank">$parse:isecdom - Referencing a DOM node in Expression</a><br />
+</strong>
+<p>
+  To set a panel to display the directions steps, use the <a href="api-gmThen.html">gm-then</a> like:
+</p>
+<pre class="code"><code class="language-javascript">
+.controller('MyCtrl', function ($scope) {
+  $scope.setPanel = function (renderer) {
+    renderer.setPanel(document.getElementById('panelId'));
+  }
+})</code></pre>
+<pre class="code"><code class="language-markup">
+&lt;gm-directions destination="destination" origin="origin" options="{travelMode: google.maps.DirectionsTravelMode.DRIVING}"&gt;
+  &lt;gm-renderer gm-then="setPanel(renderer)"&gt;&lt;/gm-renderer&gt;
+&lt;/gm-directions&gt;
+</code></pre>
+
 <strong id="example">Example:</strong>
 
 <snippets path="snippets/api-directions-renderer"></snippets>

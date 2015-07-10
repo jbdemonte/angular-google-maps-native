@@ -4,5 +4,5 @@
   <style>gm-map {display: block; width: 100%; height: 300px;}</style>
   <script src="../angular.min.js"></script>
   <script src="../angular-google-maps-native.min.js"></script>
-  <script>angular.module('MyApp', ['GoogleMapsNative']);</script>
+  <script>var app = angular.module('MyApp', ['GoogleMapsNative']); {{page.script}}</script>
 </head>{{content}}</html>
