@@ -1,7 +1,7 @@
 var testTools = {
 
   mokeGMLibrary: function () {
-    var $document, $window, $rootScope, $q,
+    var $document, $window, $rootScope, $q, $parse, $timeout,
       provider;
 
     beforeEach(function () {
@@ -16,11 +16,13 @@ var testTools = {
       inject(function () {});
     });
 
-    beforeEach(inject(function(_$window_, _$document_, _$rootScope_, _$q_) {
+    beforeEach(inject(function(_$window_, _$document_, _$rootScope_, _$q_, _$parse_, _$timeout_) {
       $window = _$window_;
       $document = _$document_;
       $rootScope = _$rootScope_;
       $q = _$q_;
+      $parse =_$parse_;
+      $timeout = _$timeout_;
     }));
 
 
@@ -34,7 +36,7 @@ var testTools = {
         callback: '__callback'
       });
 
-      gmLibrary = provider.$get[4]($document, $window, $rootScope, $q);
+      gmLibrary = provider.$get[6]($document, $window, $rootScope, $q, $parse, $timeout);
 
       gmLibrary.load().then(function () {
         gmLibrary.populate($rootScope);

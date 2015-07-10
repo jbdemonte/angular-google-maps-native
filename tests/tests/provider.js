@@ -1,7 +1,7 @@
 describe('Provider', function () {
 
   var provider, gmLibrary,
-    $window, $document, $q, $rootScope;
+    $window, $document, $rootScope, $q, $parse, $timeout;
 
   //---------------------------------------------------------------------------
   // Load Provider
@@ -23,11 +23,13 @@ describe('Provider', function () {
   // Inject required
   //---------------------------------------------------------------------------
 
-  beforeEach(inject(function(_$window_, _$document_, _$q_, _$rootScope_){
+  beforeEach(inject(function(_$window_, _$document_, _$rootScope_, _$q_, _$parse_, _$timeout_){
     $window = _$window_;
     $document = _$document_;
-    $q = _$q_;
     $rootScope = _$rootScope_;
+    $q = _$q_;
+    $parse =_$parse_;
+    $timeout = _$timeout_;
   }));
 
   //---------------------------------------------------------------------------
@@ -52,7 +54,7 @@ describe('Provider', function () {
 
     provider.configure(options);
 
-    gmLibrary = provider.$get[4]($document, $window, $rootScope, $q);
+    gmLibrary = provider.$get[6]($document, $window, $rootScope, $q, $parse, $timeout);
 
     // just to be sure of the test
     expect($window.__callback).to.be.an('undefined');
