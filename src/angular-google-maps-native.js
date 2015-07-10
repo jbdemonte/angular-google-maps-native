@@ -85,6 +85,17 @@
 
 
   /**
+   * Lower first character
+   * @param str {string}
+   * @returns {string}
+   */
+  function lcfirst(str) {
+    str += '';
+    return str.charAt(0).toLowerCase() + str.substr(1);
+  }
+
+
+  /**
    * Capitalise first character
    * @param str {string}
    * @returns {string}
@@ -479,8 +490,8 @@
         /**
          *
          * @param buildOptions
-         *          .directive  {string}    current directive name
-         *          .name       {string}    object scope name
+         *          .directive  {string}    (optional) current directive name (default is 'gm' + cls)
+         *          .name       {string}    (optional) object scope name (default is lcfirst(cls))
          *          .cls        {string}    google.maps object class => ie: Marker for google.maps.Marker
          *          .main       {object}    (optional) main property to to wait / watch / observe before creating object
          *            .name     {string}    property name
@@ -512,7 +523,7 @@
          * @returns {Object}
          */
         builder: function (buildOptions) {
-          var require = [buildOptions.directive];
+          var require = [buildOptions.directive || 'gm' + ucfirst(buildOptions.cls.toLowerCase())];
           if (angular.isArray(buildOptions.require)) {
             Array.prototype.push.apply(require, buildOptions.require);
           } else if (buildOptions.require && angular.isString(buildOptions.require)) {
@@ -557,9 +568,7 @@
                 if (visible && !opts.map && obj.setMap) {
                   obj.setMap(map);
                 }
-                if (buildOptions.name) {
-                  $scope[buildOptions.name] = obj;
-                }
+                $scope[buildOptions.name || lcfirst(buildOptions.cls)] = obj;
                 gmTools.bind(obj, $scope, $attrs);
                 deferred.resolve(obj);
               });
@@ -659,8 +668,6 @@
 
     .directive('gmMarker', ['gmOverlayBuilder', function (gmOverlayBuilder) {
       return gmOverlayBuilder.builder({
-        directive: 'gmMarker',  // current directive name
-        name: 'marker',         // scope name
         cls: 'Marker',          // google.maps object class => google.maps.Marker
         main: {                 // main property to wait / watch / observe before creating
           name: 'position',
@@ -671,8 +678,6 @@
 
     .directive('gmCircle', ['gmOverlayBuilder', function (gmOverlayBuilder) {
       return gmOverlayBuilder.builder({
-        directive: 'gmCircle',
-        name: 'circle',
         cls: 'Circle',
         main: {
           name: 'center',
@@ -683,8 +688,6 @@
 
     .directive('gmRectangle', ['gmOverlayBuilder', function (gmOverlayBuilder) {
       return gmOverlayBuilder.builder({
-        directive: 'gmRectangle',
-        name: 'rectangle',
         cls: 'Rectangle',
         main: {
           name: 'bounds',
@@ -695,7 +698,6 @@
 
     .directive('gmInfowindow', ['$parse', 'gmOverlayBuilder', 'gmTools', function ($parse, gmOverlayBuilder, gmTools) {
       return gmOverlayBuilder.builder({
-        directive: 'gmInfowindow',
         require: ['^?gmMarker'],
         name: 'infowindow',
         cls: 'InfoWindow',
@@ -851,8 +853,6 @@
 
     .directive('gmPolyline', ['gmOverlayBuilder', function (gmOverlayBuilder) {
       return gmOverlayBuilder.builder({
-        directive: 'gmPolyline',
-        name: 'polyline',
         cls: 'Polyline',
         main: {
           name: 'path',
@@ -868,8 +868,6 @@
 
     .directive('gmPolygon', ['gmOverlayBuilder', function (gmOverlayBuilder) {
       return gmOverlayBuilder.builder({
-        directive: 'gmPolygon',
-        name: 'polygon',
         cls: 'Polygon',
         main: {
           name: 'paths',
@@ -885,8 +883,6 @@
 
     .directive('gmGroundoverlay', ['$parse', 'gmOverlayBuilder', 'gmTools', function ($parse, gmOverlayBuilder, gmTools) {
       return gmOverlayBuilder.builder({
-        directive: 'gmGroundoverlay',
-        name: 'groundOverlay',
         cls: 'GroundOverlay',
         opts: true,
         instantiate: function (scope, element, attrs, options) {
@@ -913,8 +909,6 @@
 
     .directive('gmKmllayer', ['$parse', 'gmOverlayBuilder', function ($parse, gmOverlayBuilder) {
       return gmOverlayBuilder.builder({
-        directive: 'gmKmllayer',
-        name: 'kmlLayer',
         cls: 'KmlLayer',
         opts: true,
         main: {
@@ -951,16 +945,12 @@
 
     .directive('gmTrafficlayer', ['gmLayerBuilder', function (gmLayerBuilder) {
       return gmLayerBuilder.builder({
-        directive: 'gmTrafficlayer',
-        name: 'trafficLayer',
         cls: 'TrafficLayer'
       });
     }])
 
     .directive('gmBicyclinglayer', ['gmLayerBuilder', function (gmLayerBuilder) {
       return gmLayerBuilder.builder({
-        directive: 'gmBicyclinglayer',
-        name: 'bicyclingLayer',
         cls: 'BicyclingLayer'
       });
     }])
