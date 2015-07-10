@@ -6,11 +6,19 @@
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
   <script src="../dist/angular-google-maps-native.min.js"></script>
   <script>
-    angular.module('MyApp', ['GoogleMapsNative']);
+    angular.module('MyApp', ['GoogleMapsNative'])
+
+      .controller('MyCtrl', function ($scope) {
+        $scope.setPanel = function (renderer) {
+          renderer.setPanel(document.getElementById('routes'));
+        }
+      })
+
+    ;
 
   </script>
 </head>
-<body>
+<body ng-controller="MyCtrl">
   <div class="panel">
 
     <div class="item">
@@ -28,10 +36,12 @@
   <gm-map options="{center: [40.750, -73], zoom: 9}">
 
     <gm-directions destination="destination" options="{origin: '48 Pirrama Road, Pyrmont NSW', travelMode: google.maps.DirectionsTravelMode.DRIVING}">
-      <gm-renderer options="{polylineOptions:{strokeColor: '#0077c4', strokeWeight: 4, strokeOpacity: 1.0}}"></gm-renderer>
+      <gm-renderer options="{polylineOptions:{strokeColor: '#0077c4', strokeWeight: 4, strokeOpacity: 1.0}}" gm-then="setPanel(renderer)"></gm-renderer>
     </gm-directions>
 
   </gm-map>
+
+  <div id="routes"></div>
 
 </body>
 </html>

@@ -481,6 +481,12 @@
               true // once only
             );
           });
+
+          if (attrs.gmThen) {
+            controller.then(function () {
+              $parse(attrs.gmThen)(scope.$new(false));
+            });
+          }
         }
       };
     }])
@@ -660,6 +666,11 @@
                   }
                 );
               });
+              if (attrs.gmThen) {
+                controller.then(function () {
+                  $parse(attrs.gmThen)(scope.$new(false));
+                });
+              }
             }
           };
         }
