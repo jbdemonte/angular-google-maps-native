@@ -662,9 +662,11 @@
                       }
                       create(options);
                       prop($scope, $attrs, self, buildOptions.main.name, buildOptions.main.cast);
-                    }
+                    },
+                    true // once only
                   );
                 });
+
                 if ($attrs.gmThen) {
                   self.then(function () {
                     $parse($attrs.gmThen)($scope.$new(false));
