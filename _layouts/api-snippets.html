@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html ng-app="MyApp">
 <head>
-  <style>gm-map {display: block; width: 100%; height: 300px;}</style>
+  <style>{% if page.style %}{{page.style}}{% else %}gm-map {display: block; width: 100%; height: 300px;}{% endif %}</style>
   <script src="../angular.min.js"></script>
   <script src="../angular-google-maps-native.min.js"></script>
   <script>var app = angular.module('MyApp', ['GoogleMapsNative']); {{page.script}}</script>

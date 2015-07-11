@@ -8,6 +8,8 @@ active: faq
 <ul>
   <li><a href="#faq-load-library">Do I need to add the google maps library in the &lt;head&gt; section?</a></li>
   <li><a href="#faq-show-hide">May I use ng-show / ng-hide on maps?</a></li>
+  <li><a href="#faq-toogle-map-streetview">How to toogle between a Map and its StreetView?</a></li>
+  <li><a href="#faq-map-streetviewpanorama">How to attach a StreetViewPanorama to a Map?</a></li>
 </ul>
 
 <h3 id="faq-load-library">Do I need to add the google maps library in the &lt;head&gt; section?</h3>
@@ -20,3 +22,16 @@ active: faq
   Yes, ng-show / ng-hide expressions are watched and when maps are visible, a <em>resize</em> event is trigged to force maps refresh and avoid partial grey area.
 </p>
 <snippets path="snippets/faq-map-show-hide"></snippets>
+
+<h3 id="faq-toogle-map-streetview">How to toogle between a Map and its StreetView?</h3>
+<p>
+  As usual:
+</p>
+<snippets path="snippets/faq-toogle-map-streetview"></snippets>
+
+<h3 id="faq-map-streetviewpanorama">How to attach a StreetViewPanorama to a Map?</h3>
+<p>
+  Use the <a href="api-gmThen.html">gm-then</a> attribute to get the google objects and to use their native methods.
+</p>
+<snippets path="snippets/faq-map-streetviewpanorama"></snippets>
+

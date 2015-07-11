@@ -1,0 +1,17 @@
+---
+layout: api-snippets
+style: "gm-MAP, gm-streetviewpanorama {display: inline-block; width: 48%; height: 300px; margin-right: 1%}"
+---
+{% raw %}
+<body ng-init="data = {}">
+  <gm-map
+    options="{center: [42.345573,-71.098326], zoom: 4, mapTypeId: google.maps.MapTypeId.ROADMAP}"
+    gm-then="data.map = map"
+  ></gm-map>
+  <gm-streetviewpanorama
+    position="data.map.getCenter()"
+    options="{pov: {heading: 34, pitch: 10, zoom: 1}}"
+    gm-then="data.map.setStreetView(streetViewPanorama)"
+  ></gm-streetviewpanorama>
+</body>
+{% endraw %}

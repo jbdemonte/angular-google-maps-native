@@ -1,0 +1,43 @@
+---
+layout: api
+---
+
+<h2 version="1.3.0">gm-streetViewPanorama</h2>
+
+<strong>Parent</strong>
+<p>
+  <em>None</em>
+</p>
+
+<strong>Scope</strong>
+<params>
+  <item name="streetViewPanorama" type="object">
+    <doc>StreetViewPanorama</doc>
+  </item>
+</params>
+
+<strong>Parameters</strong>
+<params>
+  <item name="options" type="object" optional>
+    <doc>StreetViewPanoramaOptions</doc>
+  </item>
+  <item name="position" type="expression" optional>
+    The <a href="api.html#api-latlng">LatLng</a> of the Street View panorama.
+  </item>
+  <item name="pov" type="expression" optional>
+    <doc>StreetViewPov</doc><br />
+    The camera orientation, specified as heading and pitch, for the panorama.
+  </item>
+  <item name="zoom" type="expression" optional>
+    Sets the zoom level of the panorama.
+  </item>
+</params>
+
+<strong>Required to be run</strong>
+<ul>
+  <li>position</li>
+</ul>
+
+<strong>Example:</strong>
+
+<snippets path="snippets/api-streetViewPanorama"></snippets>

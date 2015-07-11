@@ -1,0 +1,32 @@
+---
+layout: api-snippets
+script: |
+
+  app.controller('MyCtrl', function ($scope) {
+    $scope.data = {};
+    $scope.toggle = function () {
+      var map = $scope.data.map,
+        panorama = map.getStreetView();
+      if (panorama.getVisible()){
+        map.setCenter(panorama.getPosition())
+        panorama.setVisible(false);
+      } else {
+        panorama.setPosition(map.getCenter());
+        panorama.setPov({
+          heading: 265,
+          zoom:1,
+          pitch:0
+        });
+        panorama.setVisible(true);
+      }
+    };
+  });
+---
+{% raw %}
+<body ng-controller="MyCtrl">
+
+<button ng-show="data.map" ng-click="toggle()">Toggle</button>
+<gm-map options="{center: [37.772323, -122.214897], zoom: 8, mapTypeId: google.maps.MapTypeId.ROADMAP}" gm-then="data.map = map"></gm-map>
+
+</body>
+{% endraw %}
