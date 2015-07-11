@@ -6,20 +6,20 @@
     $q, $parse, $timeout;
 
 
-    /**
-     * Handle google.maps services as singleton
-     * @param name {string}
-     * @return {google.maps.Service}
-     */
-    services = (function () {
-      var instances = {};
-      return function (name) {
-        if (!instances.hasOwnProperty(name) && googleMap[name]) {
-          instances[name] = new googleMap[name];
-        }
-        return instances[name];
-      };
-    }());
+  /**
+   * Handle google.maps services as singleton
+   * @param name {string}
+   * @return {google.maps.Service}
+   */
+  services = (function () {
+    var instances = {};
+    return function (name) {
+      if (!instances.hasOwnProperty(name) && googleMap[name]) {
+        instances[name] = new googleMap[name];
+      }
+      return instances[name];
+    };
+  }());
 
   /**
    * log error
