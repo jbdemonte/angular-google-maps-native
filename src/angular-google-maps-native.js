@@ -555,8 +555,9 @@
             scope: true,
             require : require,
             controller: ['$scope', '$element', '$attrs', function ($scope, $element, $attrs) {
-              var obj,
+              var obj, build, mapController, controllers,
                 scopeName = buildOptions.name || lcfirst(buildOptions.cls),
+                self = this,
                 deferred = $q.defer();
 
 
@@ -580,7 +581,7 @@
               /**
                * Create the object
                */
-              this._build = once(function (options, map, visible) {
+              build = once(function (options, map, visible) {
                 var opts = buildOptions.opts ? options.opts || {} : options;
                 if (!visible && opts.map) {
                   delete opts.map;
@@ -596,10 +597,86 @@
               });
 
               /**
+               * Handle the creation the object depending on its visibility
+               */
+              function create(options) {
+                var visibility = getVisibility($attrs),
+                  map = mapController.get();
+
+                // if map visibility is dynamic, evaluate it
+                if (visibility) {
+                  $scope.$watch(visibility, function (value) {
+                    if (obj) {
+                      if (buildOptions.visibility) {
+                        buildOptions.visibility($scope, $element, $attrs, controllers, value);
+                      } else {
+                        obj.setMap(value ? map : null);
+                      }
+                    } else {
+                      build(options, map, value);
+                      if (buildOptions.visibility) {
+                        buildOptions.visibility($scope, $element, $attrs, controllers, value);
+                      }
+                    }
+                  });
+                } else {
+                  build(options, map, true);
+                }
+              }
+
+              self.init = once(function (_controllers_) {
+                controllers =_controllers_;
+                mapController = controllers[controllers.length - 1];
+
+                mapController.then(function (map) {
+                  var options = {};
+
+                  // if build provide a custom constructor, use it
+                  if (buildOptions.create) {
+                    if ($attrs.options) {
+                      options = $parse($attrs.options)($scope);
+                      if (buildOptions.main && options[buildOptions.main.name]) {
+                        options[buildOptions.main.name] = buildOptions.main.cast(options[buildOptions.main.name]);
+                      }
+                    }
+                    // if it satisfy the creation, return
+                    if (buildOptions.create($scope, $element, $attrs, controllers, options, create)) {
+                      return;
+                    }
+                  }
+
+                  // no custom contructor or does not satisfy the creation, so, use default one
+                  wait(
+                    $scope,
+                    $attrs,
+                    buildOptions.main.name,
+                    function (options) {
+                      if (buildOptions.main.cast) {
+                        options[buildOptions.main.name] = buildOptions.main.cast(options[buildOptions.main.name]);
+                      }
+                      if (buildOptions.opts) {
+                        options.opts = options.opts || {};
+                        options.opts.map = map;
+                      } else {
+                        options.map = map;
+                      }
+                      create(options);
+                      prop($scope, $attrs, self, buildOptions.main.name, buildOptions.main.cast);
+                    }
+                  );
+                });
+                if ($attrs.gmThen) {
+                  self.then(function () {
+                    $parse($attrs.gmThen)($scope.$new(false));
+                  });
+                }
+              });
+
+              /**
                * Append a function in the promise process
                * @param f
                */
-              this.then = function (f) {
+              self.then = function (f) {
                 deferred.promise.then(f);
               };
 
@@ -607,85 +684,12 @@
                * return google map object
                * @returns {*}
                */
-              this.get = function () {
+              self.get = function () {
                 return obj;
               };
             }],
             link: function (scope, element, attrs, controllers) {
-              var controller = controllers[0],
-                mapController = controllers[controllers.length - 1];
-
-              /**
-               * Finalise object creation and bind visibility if needed
-               */
-              function create(options) {
-                var visibility = getVisibility(attrs),
-                  map = mapController.get();
-
-                // if map visibility is dynamic, evaluate it
-                if (visibility) {
-                  scope.$watch(visibility, function (value) {
-                    var obj = controller.get();
-                    if (obj) {
-                      if (buildOptions.visibility) {
-                        buildOptions.visibility(scope, element, attrs, controllers, value);
-                      } else {
-                        obj.setMap(value ? map : null);
-                      }
-                    } else {
-                      controller._build(options, map, value);
-                      if (buildOptions.visibility) {
-                        buildOptions.visibility(scope, element, attrs, controllers, value);
-                      }
-                    }
-                  });
-                } else {
-                  controller._build(options, map, true);
-                }
-              }
-
-              mapController.then(function (map) {
-                var options = {};
-
-                // if build provide a custom constructor, use it
-                if (buildOptions.create) {
-                  if (attrs.options) {
-                    options = $parse(attrs.options)(scope);
-                    if (buildOptions.main && options[buildOptions.main.name]) {
-                      options[buildOptions.main.name] = buildOptions.main.cast(options[buildOptions.main.name]);
-                    }
-                  }
-                  // if it satisfy the creation, return
-                  if (buildOptions.create(scope, element, attrs, controllers, options, create)) {
-                    return;
-                  }
-                }
-
-                // no custom contructor or does not satisfy the creation, so, use default one
-                wait(
-                  scope,
-                  attrs,
-                  buildOptions.main.name,
-                  function (options) {
-                    if (buildOptions.main.cast) {
-                      options[buildOptions.main.name] = buildOptions.main.cast(options[buildOptions.main.name]);
-                    }
-                    if (buildOptions.opts) {
-                      options.opts = options.opts || {};
-                      options.opts.map = map;
-                    } else {
-                      options.map = map;
-                    }
-                    create(options);
-                    prop(scope, attrs, controller, buildOptions.main.name, buildOptions.main.cast);
-                  }
-                );
-              });
-              if (attrs.gmThen) {
-                controller.then(function () {
-                  $parse(attrs.gmThen)(scope.$new(false));
-                });
-              }
+              controllers[0].init(controllers);
             }
           };
         }
