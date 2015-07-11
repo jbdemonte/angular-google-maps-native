@@ -1,4 +1,4 @@
-(function(angular) {
+(function(angular, undefined) {
   'use strict';
 
   var googleMap, // will be set when library will be loaded (used to reduce code weight when minifying)
@@ -407,6 +407,15 @@
 
           $element.append(target);
 
+          $scope.$on("$destroy", function () {
+            if (map) {
+              map = undefined;
+              delete $scope.map;
+            } else {
+              deferred.reject();
+            }
+          });
+
           /**
            * Create the map
            */
@@ -546,7 +555,9 @@
             scope: true,
             require : require,
             controller: ['$scope', '$element', '$attrs', function ($scope, $element, $attrs) {
-              var obj, deferred = $q.defer();
+              var obj,
+                scopeName = buildOptions.name || lcfirst(buildOptions.cls),
+                deferred = $q.defer();
 
 
               /**
@@ -557,9 +568,10 @@
                   if (buildOptions.destroy) {
                     buildOptions.destroy($scope, $element, $attrs, obj);
                   } else {
-                    obj.setMap(null);
+                    obj.setMap(undefined);
                   }
-                  obj = null;
+                  obj = undefined;
+                  delete $scope[scopeName];
                 } else {
                   deferred.reject();
                 }
@@ -578,7 +590,7 @@
                 if (visible && !opts.map && obj.setMap) {
                   obj.setMap(map);
                 }
-                $scope[buildOptions.name || lcfirst(buildOptions.cls)] = obj;
+                $scope[scopeName] = obj;
                 bind(obj, $scope, $attrs);
                 deferred.resolve(obj);
               });
@@ -980,6 +992,15 @@
           var streetViewPanorama, build,
             self = this,
             deferred = $q.defer();
+
+          $scope.$on("$destroy", function () {
+            if (streetViewPanorama) {
+              streetViewPanorama = undefined;
+              delete $scope.streetViewPanorama;
+            } else {
+              deferred.reject();
+            }
+          });
 
           /**
            * Create the streetViewPanorama
