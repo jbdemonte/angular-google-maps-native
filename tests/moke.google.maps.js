@@ -52,6 +52,14 @@ var google = (function () {
     }
   });
 
+  maps.StreetViewPanorama = createGenericObject({
+    prop: 'position pov zoom',
+    constructor: function (mapDiv, options) {
+      this.__data.__mapDiv = mapDiv;
+      angular.extend(this.__data, options);
+    }
+  });
+
   maps.Marker = createGenericObject({
     prop: 'animation attribution clickable cursor draggable icon map opacity place position shape title visible zIndex',
     constructor: true

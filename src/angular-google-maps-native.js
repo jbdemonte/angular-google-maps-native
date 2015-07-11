@@ -60,6 +60,15 @@
   }
 
   /**
+   * Cast to number
+   * @param value {string|number}
+   * @returns {number}
+   */
+  function toNumber(value) {
+    return 1 * value;
+  }
+
+  /**
    * Convert mixed bounds to google.maps.LatLngBounds (NE, SW)
    * [LatLng, LatLng], [lat 1, lng 1, lat 2, lng 2], [latLng1, latLng2], {ne: LatLng, sw: LatLng}, {n:number, e:number, s:number, w:number}
    * @param mixed {*}
@@ -469,9 +478,7 @@
 
                 prop(scope, attrs, controller, 'mapTypeId');
 
-                prop(scope, attrs, controller, 'heading tilt zoom', function (value) {
-                  return 1 * value;
-                });
+                prop(scope, attrs, controller, 'heading tilt zoom', toNumber);
               },
               true // once only
             );
@@ -955,6 +962,103 @@
       return gmLayerBuilder.builder({
         cls: 'BicyclingLayer'
       });
+    }])
+
+    .directive('gmStreetviewpanorama', ['gmLibrary', function (gmLibrary) {
+      return {
+        restrict: 'E',
+        scope: true,
+        controller: ['$scope', '$element', '$attrs', function ($scope, $element, $attrs) {
+          var streetViewPanorama, build,
+            self = this,
+            deferred = $q.defer();
+
+          /**
+           * Create the streetViewPanorama
+           */
+          build = once(function (options) {
+            $timeout(function () { // wait until dom element visibility is toggled if needed
+              streetViewPanorama = new googleMap.StreetViewPanorama($element[0], options);
+              $scope.streetViewPanorama = streetViewPanorama;
+              bind(streetViewPanorama, $scope, $attrs);
+              deferred.resolve(streetViewPanorama);
+            }, 100);
+          });
+
+          /**
+           * Handle the creation the streetViewPanorama depending on its visibility
+           */
+          function create(options) {
+            var visibility = getVisibility($attrs);
+            // if map visibility is dynamic, evaluate it
+            if (visibility) {
+              $scope.$watch(visibility, function (value) {
+                if (value) {
+                  if (streetViewPanorama) {
+                    $timeout(function () {
+                      googleMap.event.trigger(streetViewPanorama, 'resize');
+                    });
+                  } else {
+                    build(options);
+                  }
+                }
+              });
+            } else {
+              build(options);
+            }
+          }
+
+          self.init = once(function () {
+            gmLibrary.load().then(function () {
+
+              gmLibrary.populate($scope);
+
+              wait(
+                $scope,
+                $attrs,
+                'position',
+                function (options) {
+                  options.position = toLatLng(options.position);
+                  create(options);
+
+                  prop($scope, $attrs, self, 'position', toLatLng);
+
+                  prop($scope, $attrs, self, 'pov');
+
+                  prop($scope, $attrs, self, 'zoom', toNumber);
+                },
+                true // once only
+              );
+            });
+
+            if ($attrs.gmThen) {
+              self.then(function () {
+                $parse($attrs.gmThen)($scope.$new(false));
+              });
+            }
+
+          });
+
+          /**
+           * Append a function in the promise process
+           * @param f
+           */
+          self.then = function (f) {
+            deferred.promise.then(f);
+          };
+
+          /**
+           * return google map object
+           * @returns {*}
+           */
+          self.get = function () {
+            return streetViewPanorama;
+          };
+        }],
+        link: function (scope, elem, attrs, controller) {
+          controller.init();
+        }
+      };
     }])
 
   ;

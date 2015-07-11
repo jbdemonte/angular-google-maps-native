@@ -20,7 +20,8 @@ body {
 .panel .item + .item {
   margin-left: 10px
 }
-gm-map {
+gm-map,
+gm-streetviewpanorama {
   display: block;
   width: 100%;
   height: 300px;

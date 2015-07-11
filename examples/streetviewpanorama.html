@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html ng-app="MyApp">
+<head lang="en">
+  <meta charset="UTF-8">
+  <link rel="stylesheet" type="text/css" href="assets/style.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+  <script src="../src/angular-google-maps-native.js"></script>
+  <script>
+    angular.module('MyApp', ['GoogleMapsNative']);
+  </script>
+</head>
+<body ng-init="data = {}">
+<div class="panel">
+  <div class="item">
+    <label>
+      <input type="checkbox" ng-model="showStreetViewPanorama"> Show the streetViewPanorama
+    </label>
+  </div>
+</div>
+
+  <gm-map options="{center: [42.345573,-71.098326], zoom: 4, mapTypeId: google.maps.MapTypeId.ROADMAP}" gm-then="data.map = map"></gm-map>
+
+  <br />
+
+  <gm-streetviewpanorama ng-show="showStreetViewPanorama" position="data.map.getCenter()" options="{pov: {heading: 34, pitch: 10, zoom: 1}}" gm-then="data.map.setStreetView(streetViewPanorama)"></gm-streetviewpanorama>
+
+</body>
+</html>
