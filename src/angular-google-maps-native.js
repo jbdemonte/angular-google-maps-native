@@ -388,7 +388,9 @@
         restrict: 'E',
         scope: true,
         controller: ['$scope', '$element', '$attrs', function ($scope, $element, $attrs) {
-          var map, deferred = $q.defer(),
+          var map, build,
+            self = this,
+            deferred = $q.defer(),
             target = angular.element(document.createElement('DIV'));
 
           if (!$element.css('position')) {
@@ -408,7 +410,7 @@
           /**
            * Create the map
            */
-          this._build = once(function (element, options) {
+          build = once(function (options) {
             $timeout(function () { // wait until dom element visibility is toggled if needed
               map = new googleMap.Map(target[0], options);
               $scope.map = map;
@@ -418,10 +420,64 @@
           });
 
           /**
+           * Create the map
+           */
+          function create(options) {
+            var visibility = getVisibility($attrs);
+            // if map visibility is dynamic, evaluate it
+            if (visibility) {
+              $scope.$watch(visibility, function (value) {
+                if (value) {
+                  if (map) {
+                    $timeout(function () {
+                      googleMap.event.trigger(map, 'resize');
+                    });
+                  } else {
+                    build(options);
+                  }
+                }
+              });
+            } else {
+              build(options);
+            }
+          }
+
+          self.init = function () {
+            gmLibrary.load().then(function () {
+
+              gmLibrary.populate($scope);
+
+              wait(
+                $scope,
+                $attrs,
+                'center zoom',
+                function (options) {
+                  options.center = toLatLng(options.center);
+                  options.zoom = 1 * options.zoom;
+                  create(options);
+
+                  prop($scope, $attrs, self, 'center', toLatLng);
+
+                  prop($scope, $attrs, self, 'mapTypeId');
+
+                  prop($scope, $attrs, self, 'heading tilt zoom', toNumber);
+                },
+                true // once only
+              );
+            });
+
+            if ($attrs.gmThen) {
+              self.then(function () {
+                $parse($attrs.gmThen)($scope.$new(false));
+              });
+            }
+          };
+
+          /**
            * Append a function in the promise process
            * @param f
            */
-          this.then = function (f) {
+          self.then = function (f) {
             deferred.promise.then(f);
           };
 
@@ -429,66 +485,12 @@
            * return google map object
            * @returns {*}
            */
-          this.get = function () {
+          self.get = function () {
             return map;
           };
-
-          // Load library and populate scope
-          gmLibrary.load().then(function () {
-            gmLibrary.populate($scope);
-          });
         }],
         link: function (scope, elem, attrs, controller) {
-
-          /**
-           * Create the map
-           */
-          function create(options) {
-            var visibility = getVisibility(attrs);
-            // if map visibility is dynamic, evaluate it
-            if (visibility) {
-              scope.$watch(visibility, function (value) {
-                if (value) {
-                  var map = controller.get();
-                  if (map) {
-                    $timeout(function () {
-                      googleMap.event.trigger(map, 'resize');
-                    });
-                  } else {
-                    controller._build(elem, options);
-                  }
-                }
-              });
-            } else {
-              controller._build(elem, options);
-            }
-          }
-
-          gmLibrary.load().then(function () {
-            wait(
-              scope,
-              attrs,
-              'center zoom',
-              function (options) {
-                options.center = toLatLng(options.center);
-                options.zoom = 1 * options.zoom;
-                create(options);
-
-                prop(scope, attrs, controller, 'center', toLatLng);
-
-                prop(scope, attrs, controller, 'mapTypeId');
-
-                prop(scope, attrs, controller, 'heading tilt zoom', toNumber);
-              },
-              true // once only
-            );
-          });
-
-          if (attrs.gmThen) {
-            controller.then(function () {
-              $parse(attrs.gmThen)(scope.$new(false));
-            });
-          }
+          controller.init();
         }
       };
     }])
@@ -1036,7 +1038,6 @@
                 $parse($attrs.gmThen)($scope.$new(false));
               });
             }
-
           });
 
           /**
