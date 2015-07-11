@@ -115,6 +115,11 @@ var google = (function () {
     constructor: true
   });
 
+  maps.TransitLayer = createGenericObject({
+    prop: 'map',
+    constructor: true
+  });
+
   maps.GroundOverlay = createGenericObject({
     prop: 'bounds:get map opacity url:get',
     constructor: function (url, bounds, options) {

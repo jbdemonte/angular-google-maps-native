@@ -966,6 +966,12 @@
       });
     }])
 
+    .directive('gmTransitlayer', ['gmLayerBuilder', function (gmLayerBuilder) {
+      return gmLayerBuilder.builder({
+        cls: 'TransitLayer'
+      });
+    }])
+
     .directive('gmStreetviewpanorama', ['gmLibrary', function (gmLibrary) {
       return {
         restrict: 'E',
@@ -992,7 +998,7 @@
            */
           function create(options) {
             var visibility = getVisibility($attrs);
-            // if map visibility is dynamic, evaluate it
+            // if visibility is dynamic, evaluate it
             if (visibility) {
               $scope.$watch(visibility, function (value) {
                 if (value) {
