@@ -1,0 +1,20 @@
+---
+layout: api-snippets
+---
+{% raw %}
+<body ng-init="showTransitLayer=true">
+
+<div class="panel">
+  <div class="item">
+    <label>
+      <input type="checkbox" ng-model="showTransitLayer"> Show the TransitLayer
+    </label>
+  </div>
+</div>
+
+<gm-map options="{center: [51.501904,-0.115871], zoom: 13}">
+  <gm-transitLayer ng-show="showTransitLayer"></gm-transitLayer>
+</gm-map>
+
+</body>
+{% endraw %}
