@@ -34,12 +34,14 @@ describe('gm-then', function () {
       infowindow: 0,
       trafficLayer: 0,
       bicyclingLayer: 0,
+      transitLayer: 0,
       renderer: 0,
       rectangle: 0,
       groundOverlay: 0,
       kmlLayer: 0,
       polygon: 0,
       polyline: 0,
+      streetviewpanorama: 0,
       circle: 0
     };
     $scope.objects = {};
@@ -53,6 +55,7 @@ describe('gm-then', function () {
         '<gm-circle options="{center: map.getCenter()}" gm-then="data.circle = data.circle + 1; objects.circle = circle"></gm-circle>' +
         '<gm-trafficLayer gm-then="data.trafficLayer = data.trafficLayer + 1; objects.trafficLayer = trafficLayer"></gm-trafficLayer>' +
         '<gm-bicyclingLayer gm-then="data.bicyclingLayer = data.bicyclingLayer + 1; objects.bicyclingLayer = bicyclingLayer"></gm-bicyclingLayer>' +
+        '<gm-transitLayer gm-then="data.transitLayer = data.transitLayer + 1; objects.transitLayer = transitLayer"></gm-transitLayer>' +
         '<gm-directions origin="origin" destination="destination" travelMode="travelMode" options="{origin: \'from\', destination: \'to\', travelMode: \'mode\'}">' +
           '<gm-renderer gm-then="data.renderer = data.renderer + 1; objects.renderer = renderer"></gm-renderer>' +
         '</gm-directions>' +
@@ -61,7 +64,8 @@ describe('gm-then', function () {
         '<gm-kmlLayer options="{url:\'http://url\', opts: {suppressInfoWindows:true}}" gm-then="data.kmlLayer = data.kmlLayer + 1; objects.kmlLayer = kmlLayer"></gm-kmlLayer>' +
         '<gm-polygon options="{paths:[[1, 2], [3, 4], [5, 6]]}" gm-then="data.polygon = data.polygon + 1; objects.polygon = polygon"></gm-polygon>' +
         '<gm-polyline options="{path:[[1, 2], [3, 4], [5, 6]]}" gm-then="data.polyline = data.polyline + 1; objects.polyline = polyline"></gm-polyline>' +
-      '</gm-map>'
+      '</gm-map>' +
+      '<gm-streetviewpanorama options="{position: [1, 2]}" gm-then="data.streetviewpanorama = data.streetviewpanorama + 1; objects.streetviewpanorama = streetViewPanorama"></gm-streetviewpanorama>'
     )($scope);
 
     $scope.$digest();
@@ -73,11 +77,13 @@ describe('gm-then', function () {
     expect($scope.data.circle).to.be.equal(1);
     expect($scope.data.trafficLayer).to.be.equal(1);
     expect($scope.data.bicyclingLayer).to.be.equal(1);
+    expect($scope.data.transitLayer).to.be.equal(1);
     expect($scope.data.rectangle).to.be.equal(1);
     expect($scope.data.groundOverlay).to.be.equal(1);
     expect($scope.data.kmlLayer).to.be.equal(1);
     expect($scope.data.polygon).to.be.equal(1);
     expect($scope.data.polyline).to.be.equal(1);
+    expect($scope.data.streetviewpanorama).to.be.equal(1);
 
     expect($scope.objects.map instanceof googleMaps.Map).to.be.equal(true);
     expect($scope.objects.mapMarker instanceof googleMaps.Map).to.be.equal(true);
@@ -87,11 +93,13 @@ describe('gm-then', function () {
     expect($scope.objects.circle instanceof googleMaps.Circle).to.be.equal(true);
     expect($scope.objects.trafficLayer instanceof googleMaps.TrafficLayer).to.be.equal(true);
     expect($scope.objects.bicyclingLayer instanceof googleMaps.BicyclingLayer).to.be.equal(true);
+    expect($scope.objects.transitLayer instanceof googleMaps.TransitLayer).to.be.equal(true);
     expect($scope.objects.rectangle instanceof googleMaps.Rectangle).to.be.equal(true);
     expect($scope.objects.groundOverlay instanceof googleMaps.GroundOverlay).to.be.equal(true);
     expect($scope.objects.kmlLayer instanceof googleMaps.KmlLayer).to.be.equal(true);
     expect($scope.objects.polygon instanceof googleMaps.Polygon).to.be.equal(true);
     expect($scope.objects.polyline instanceof googleMaps.Polyline).to.be.equal(true);
+    expect($scope.objects.streetviewpanorama instanceof googleMaps.StreetViewPanorama).to.be.equal(true);
 
     // direction renderer
     setTimeout(function() {
