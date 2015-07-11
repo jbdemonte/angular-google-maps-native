@@ -229,15 +229,31 @@
    * Observe some attributes and wait all of them to run a callback
    * @param scope {Scope}
    * @param attrs {Attributes}
-   * @param features {string} space separated attribute names to observes
+   * @param features {string|object} string: space separated attribute names to observes; object: {name:cast}
    * @param callback {function} callback to run
    * @param once {boolean} (optional, default=false) watch only one time
    */
   function wait(scope, attrs, features, callback, once) {
 
-    var handlers = [],
-      mandatories = features.split(" "),
+    var mandatories,
+      handlers = [],
       options = {};
+
+    if (angular.isString(features)) {
+      mandatories = features.split(" ");
+      features = {}; // all features has no cast function associated
+    } else {
+      mandatories = Object.keys(features);
+    }
+
+    function call() {
+      angular.forEach(features, function (cast, name) {
+        if (cast) {
+          options[name] = cast(options[name]);
+        }
+      });
+      callback(options);
+    }
 
     function isComplete() {
       var result = true;
@@ -253,7 +269,7 @@
     }
 
     if (isComplete()) {
-      callback(options);
+      call();
     }
     if (!once || !isComplete()) {
       angular.forEach(mandatories, function (feature) {
@@ -270,7 +286,7 @@
                     handler();
                   });
                 }
-                callback(options);
+                call();
               }
             }
           }));
@@ -459,10 +475,8 @@
               wait(
                 $scope,
                 $attrs,
-                'center zoom',
+                {center: toLatLng, zoom: toNumber},
                 function (options) {
-                  options.center = toLatLng(options.center);
-                  options.zoom = 1 * options.zoom;
                   create(options);
 
                   prop($scope, $attrs, self, 'center', toLatLng);
@@ -629,7 +643,8 @@
                 mapController = controllers[controllers.length - 1];
 
                 mapController.then(function (map) {
-                  var options = {};
+                  var waitFor = {},
+                    options = {};
 
                   // if build provide a custom constructor, use it
                   if (buildOptions.create) {
@@ -645,15 +660,13 @@
                     }
                   }
 
-                  // no custom contructor or does not satisfy the creation, so, use default one
+                  waitFor[buildOptions.main.name] = buildOptions.main.cast;
+                  // no custom constructor or does not satisfy the creation, so, use default one
                   wait(
                     $scope,
                     $attrs,
-                    buildOptions.main.name,
+                    waitFor,
                     function (options) {
-                      if (buildOptions.main.cast) {
-                        options[buildOptions.main.name] = buildOptions.main.cast(options[buildOptions.main.name]);
-                      }
                       if (buildOptions.opts) {
                         options.opts = options.opts || {};
                         options.opts.map = map;
@@ -762,9 +775,8 @@
             wait(
               scope,
               attrs,
-              'position',
+              {position: toLatLng},
               function (options) {
-                options.position = toLatLng(options.position);
                 payload(options);
                 prop(scope, attrs, controllers[0], 'position', toLatLng);
               },
@@ -1051,9 +1063,8 @@
               wait(
                 $scope,
                 $attrs,
-                'position',
+                {position: toLatLng},
                 function (options) {
-                  options.position = toLatLng(options.position);
                   create(options);
 
                   prop($scope, $attrs, self, 'position', toLatLng);
