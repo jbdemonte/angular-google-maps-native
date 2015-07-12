@@ -28,6 +28,7 @@
     "src",
     "gulpfile.js",
     ".gitignore",
+    ".travis.yml",
     "README.md"
   ]
 }
