@@ -3,7 +3,8 @@
 
   var googleMap, // will be set when library will be loaded (used to reduce code weight when minifying)
     services,
-    $q, $parse, $timeout;
+    $q, $parse, $timeout,
+    gmAddress = 'gmAddress';
 
 
   /**
@@ -20,6 +21,27 @@
       return instances[name];
     };
   }());
+
+  /**
+   * A service for converting between an address and a LatLng.
+   * @param request {GeocoderRequest}
+   * @returns {Promise}
+   */
+  function geocode(request) {
+    var deferred = $q.defer();
+    services('Geocoder').geocode(
+      angular.isString(request) ? {address: request} : request,
+      function (results, status) {
+        if (status === googleMap.GeocoderStatus.OK) {
+          deferred.resolve(results[0].geometry.location, results);
+        }  else {
+          error("geocode: " + status);
+          deferred.reject();
+        }
+      }
+    );
+    return deferred.promise;
+  }
 
   /**
    * log error
@@ -178,51 +200,65 @@
   }
 
   /**
-   * Observe some attributes and run callback
-   * @param scope {Scope}
-   * @param attrs {Attributes}
-   * @param features {string} space separated attribute names to observes
-   * @param callback {function} callback to run
-   * @param once {boolean} (optional, default=false) watch only one time
+   * Watch "gm-address" attribute
+   * @param scope
+   * @param attrs
+   * @param callback {function}
+   * @returns {undefined|function()} deregistration function
    */
-  function watch(scope, attrs, features, callback, once) {
-    angular.forEach(features.split(' '), function (feature) {
-      var stop,
-        normalised = feature.toLowerCase();
-      if (normalised in attrs) {
-        stop = scope.$watch(attrs[normalised], function (value) {
-          if (angular.isDefined(value)) {
-            if (once) {
-              stop();
+  function address(scope, attrs, callback) {
+    var lastValue, handler;
+    if (gmAddress in attrs) {
+      handler = scope.$watch(attrs[gmAddress], function (value) {
+        // address may change before getting geocoder result, so, we need to ensure that this is the latest value
+        lastValue = value;
+        if (value) {
+          geocode(value).then(function (latLng) {
+            if (angular.equals(lastValue, value)) { // result is still valid, request does not changed
+              callback(latLng);
             }
-            callback(value, feature);
-          }
-        });
-      }
-    });
+          });
+        }
+      })
+    }
+    return handler;
   }
 
   /**
-   * Observe some attributes and run google maps generic functions (setX, setY)
+   * Watch some attributes and run google maps generic functions (setX, setY)
    * @param scope {Scope}
    * @param attrs {Attributes}
    * @param controller {Controller}
    * @param features {string} space separated attribute names to observes
    * @param cast {function} (optional) allow to preprocess value observed
-   * @param once {boolean} (optional, default=false) watch only one time
    */
-  function prop(scope, attrs, controller, features, cast, once) {
-    watch(
-      scope,
-      attrs,
-      features,
-      function (value, feature) {
+  function prop(scope, attrs, controller, features, cast) {
+    angular.forEach(features.split(' '), function (feature) {
+      var normalised = feature.toLowerCase();
+
+      function callback(value) {
         controller.then(function (obj) {
           obj['set' + ucfirst(feature)](cast ? cast(value) : value);
         });
-      },
-      once
-    );
+      }
+
+      if (normalised in attrs) {
+        scope.$watch(attrs[normalised], function (value) {
+          if (angular.isDefined(value)) {
+            callback(value);
+          }
+        });
+      }
+      if (cast === toLatLng) {
+        address(
+          scope,
+          attrs,
+          function (latLng) {
+            callback(latLng);
+          }
+        );
+      }
+    });
   }
 
   /**
@@ -235,7 +271,7 @@
    */
   function wait(scope, attrs, features, callback, once) {
 
-    var mandatories,
+    var mandatories, handler,
       handlers = [],
       options = {};
 
@@ -246,6 +282,9 @@
       mandatories = Object.keys(features);
     }
 
+    /**
+     * cast values if needed and run callback
+     */
     function call() {
       angular.forEach(features, function (cast, name) {
         if (cast) {
@@ -255,12 +294,31 @@
       callback(options);
     }
 
+    /**
+     * Return True if all mandatories are provided
+     * @returns {boolean}
+     */
     function isComplete() {
       var result = true;
       angular.forEach(mandatories, function (name) {
         result = result && options[name];
       });
       return result;
+    }
+
+    /**
+     * Test mandatories, unbind if needed and run callback handler
+     */
+    function check() {
+      if (isComplete()) {
+        // stop all watches
+        if (once) {
+          angular.forEach(handlers, function (handler) {
+            handler();
+          });
+        }
+        call();
+      }
     }
 
     // evaluate options from element attribute
@@ -271,27 +329,37 @@
     if (isComplete()) {
       call();
     }
+
     if (!once || !isComplete()) {
-      angular.forEach(mandatories, function (feature) {
-        var normalised = feature.toLowerCase();
+      angular.forEach(mandatories, function (name) {
+        var watched = false,
+          normalised = name.toLowerCase();
 
         if (normalised in attrs) {
+          watched = true;
           handlers.push(scope.$watch(attrs[normalised], function (value) {
             if (angular.isDefined(value)) {
-              options[feature] = value;
-              if (isComplete()) {
-                // stop all watches
-                if (once) {
-                  angular.forEach(handlers, function (handler) {
-                    handler();
-                  });
-                }
-                call();
-              }
+              options[name] = value;
+              check();
             }
           }));
-        } else if (!angular.isDefined(options[feature])) {
-          error(feature + ' not defined');
+        }
+        if (features[name] === toLatLng) {
+          handler = address(
+            scope,
+            attrs,
+            function (latLng) {
+              options[name] = latLng;
+              check();
+            }
+          );
+          if (handler) {
+            watched = true;
+            handlers.push(handler);
+          }
+        }
+        if (!watched && !angular.isDefined(options[name])) {
+          error(name + ' missing');
         }
       });
     }

@@ -200,6 +200,45 @@ var google = (function () {
     }
   };
 
+  maps.GeocoderStatus = {
+    ERROR: "ERROR",
+    INVALID_REQUEST: "INVALID_REQUEST",
+    OK: "OK",
+    OVER_QUERY_LIMIT: "OVER_QUERY_LIMIT",
+    REQUEST_DENIED: "REQUEST_DENIED",
+    UNKNOWN_ERROR: "UNKNOWN_ERROR",
+    ZERO_RESULTS: "ZERO_RESULTS"
+  };
+
+
+  maps.Geocoder = function () {
+    /**
+     * will return LatLng using address: e.g:  100,200 => LatLng(100,200)
+     * if address.options equal one of the GeocoderStatus, will return this status as result
+     * @param options
+     * @param callback
+     */
+    this.geocode = function (options, callback) {
+      setTimeout(function () {
+        var values, results, status;
+        if (options.address in maps.GeocoderStatus) {
+          status = options.address;
+        } else {
+          values = options.address.split(',');
+          results = [
+            {
+              geometry: {
+                location: new maps.LatLng(1*values[0], 1*values[1])
+              }
+            }
+          ];
+          status = maps.GeocoderStatus.OK;
+        }
+        callback(results, status);
+      });
+    }
+  };
+
 
   return {maps: maps}
 }());

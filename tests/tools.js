@@ -74,6 +74,16 @@ var testTools = {
       expect(latLngBounds.ne().lng()).to.be.equal(e);
       expect(latLngBounds.sw().lat()).to.be.equal(s);
       expect(latLngBounds.sw().lng()).to.be.equal(w);
+    },
+    noFlush: function (flushable) {
+      var catched = false;
+      try {
+        flushable.flush();
+      }
+      catch(err) {
+        catched = true;
+      }
+      expect(catched).to.be.equal(true);
     }
   }
 
