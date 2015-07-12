@@ -1,32 +1,57 @@
-/*!
- *  angular-google-maps-native
- *  Version   : 1.2.0
- *  Date      : 2015-07-09
- *  Author    : DEMONTE Jean-Baptiste
- *  Contact   : jbdemonte@gmail.com
- *  Licence   : GPL v3 : http://www.gnu.org/licenses/gpl.html
- */
-(function(angular) {
+/*! angular-google-maps-native v1.3.0 | 2015-07-12 | DEMONTE Jean-Baptiste | jbdemonte@gmail.com | GPL v3 */
+(function(angular, undefined) {
   'use strict';
 
   var googleMap, // will be set when library will be loaded (used to reduce code weight when minifying)
-    services;
+    services,
+    $q, $parse, $timeout,
+    gmAddress = 'gmAddress';
 
 
-    /**
-     * Handle google.maps services as singleton
-     * @param name {string}
-     * @return {google.maps.Service}
-     */
-    services = (function () {
-      var instances = {};
-      return function (name) {
-        if (!instances.hasOwnProperty(name) && googleMap[name]) {
-          instances[name] = new googleMap[name];
+  /**
+   * Handle google.maps services as singleton
+   * @param name {string}
+   * @return {google.maps.Service}
+   */
+  services = (function () {
+    var instances = {};
+    return function (name) {
+      if (!instances.hasOwnProperty(name) && googleMap[name]) {
+        instances[name] = new googleMap[name];
+      }
+      return instances[name];
+    };
+  }());
+
+  /**
+   * A service for converting between an address and a LatLng.
+   * @param request {GeocoderRequest}
+   * @returns {Promise}
+   */
+  function geocode(request) {
+    var deferred = $q.defer();
+    services('Geocoder').geocode(
+      angular.isString(request) ? {address: request} : request,
+      function (results, status) {
+        if (status === googleMap.GeocoderStatus.OK) {
+          deferred.resolve(results[0].geometry.location, results);
+        }  else {
+          error("geocode: " + status);
+          deferred.reject();
         }
-        return instances[name];
-      };
-    }());
+      }
+    );
+    return deferred.promise;
+  }
+
+  /**
+   * log error
+   */
+  function error() {
+    if (console) {
+      console.error.apply(console, arguments);
+    }
+  }
 
 
   /**
@@ -55,6 +80,15 @@
       result = new googleMap.LatLng(mixed.lat, mixed.lng);
     }
     return result;
+  }
+
+  /**
+   * Cast to number
+   * @param value {string|number}
+   * @returns {number}
+   */
+  function toNumber(value) {
+    return 1 * value;
   }
 
   /**
@@ -89,6 +123,17 @@
       return new googleMap.LatLngBounds(sw, ne);
     }
     return null;
+  }
+
+
+  /**
+   * Lower first character
+   * @param str {string}
+   * @returns {string}
+   */
+  function lcfirst(str) {
+    str += '';
+    return str.charAt(0).toLowerCase() + str.substr(1);
   }
 
 
@@ -132,6 +177,195 @@
       .toLowerCase();
   }
 
+  /**
+   * Bind events on google map object from attributes
+   * @param obj {Google.Maps.Object}
+   * @param scope {Scope}
+   * @param attrs {Attributes}
+   */
+  function bind(obj, scope, attrs) {
+    angular.forEach(attrs, function (value, key) {
+      var match = key.match(/^on(ce)?[A-Z]/);
+      if (match) {
+        googleMap.event['addListener' + (match[1] ? 'Once' : '')](obj, eventName(key), function (event) {
+          $timeout(function () {
+            scope.$apply(function () {
+              var childScope = scope.$new(false);
+              childScope.event = event;
+              $parse(value)(childScope);
+            });
+          });
+        });
+      }
+    });
+  }
+
+  /**
+   * Watch "gm-address" attribute
+   * @param scope
+   * @param attrs
+   * @param callback {function}
+   * @returns {undefined|function()} deregistration function
+   */
+  function address(scope, attrs, callback) {
+    var lastValue, handler;
+    if (gmAddress in attrs) {
+      handler = scope.$watch(attrs[gmAddress], function (value) {
+        // address may change before getting geocoder result, so, we need to ensure that this is the latest value
+        lastValue = value;
+        if (value) {
+          geocode(value).then(function (latLng) {
+            if (angular.equals(lastValue, value)) { // result is still valid, request does not changed
+              callback(latLng);
+            }
+          });
+        }
+      })
+    }
+    return handler;
+  }
+
+  /**
+   * Watch some attributes and run google maps generic functions (setX, setY)
+   * @param scope {Scope}
+   * @param attrs {Attributes}
+   * @param controller {Controller}
+   * @param features {string} space separated attribute names to observes
+   * @param cast {function} (optional) allow to preprocess value observed
+   */
+  function prop(scope, attrs, controller, features, cast) {
+    angular.forEach(features.split(' '), function (feature) {
+      var normalised = feature.toLowerCase();
+
+      function callback(value) {
+        controller.then(function (obj) {
+          obj['set' + ucfirst(feature)](cast ? cast(value) : value);
+        });
+      }
+
+      if (normalised in attrs) {
+        scope.$watch(attrs[normalised], function (value) {
+          if (angular.isDefined(value)) {
+            callback(value);
+          }
+        });
+      }
+      if (cast === toLatLng) {
+        address(
+          scope,
+          attrs,
+          function (latLng) {
+            callback(latLng);
+          }
+        );
+      }
+    });
+  }
+
+  /**
+   * Observe some attributes and wait all of them to run a callback
+   * @param scope {Scope}
+   * @param attrs {Attributes}
+   * @param features {string|object} string: space separated attribute names to observes; object: {name:cast}
+   * @param callback {function} callback to run
+   * @param once {boolean} (optional, default=false) watch only one time
+   */
+  function wait(scope, attrs, features, callback, once) {
+
+    var mandatories, handler,
+      handlers = [],
+      options = {};
+
+    if (angular.isString(features)) {
+      mandatories = features.split(" ");
+      features = {}; // all features has no cast function associated
+    } else {
+      mandatories = Object.keys(features);
+    }
+
+    /**
+     * cast values if needed and run callback
+     */
+    function call() {
+      angular.forEach(features, function (cast, name) {
+        if (cast) {
+          options[name] = cast(options[name]);
+        }
+      });
+      callback(options);
+    }
+
+    /**
+     * Return True if all mandatories are provided
+     * @returns {boolean}
+     */
+    function isComplete() {
+      var result = true;
+      angular.forEach(mandatories, function (name) {
+        result = result && options[name];
+      });
+      return result;
+    }
+
+    /**
+     * Test mandatories, unbind if needed and run callback handler
+     */
+    function check() {
+      if (isComplete()) {
+        // stop all watches
+        if (once) {
+          angular.forEach(handlers, function (handler) {
+            handler();
+          });
+        }
+        call();
+      }
+    }
+
+    // evaluate options from element attribute
+    if (attrs.options) {
+      options = $parse(attrs.options)(scope);
+    }
+
+    if (isComplete()) {
+      call();
+    }
+
+    if (!once || !isComplete()) {
+      angular.forEach(mandatories, function (name) {
+        var watched = false,
+          normalised = name.toLowerCase();
+
+        if (normalised in attrs) {
+          watched = true;
+          handlers.push(scope.$watch(attrs[normalised], function (value) {
+            if (angular.isDefined(value)) {
+              options[name] = value;
+              check();
+            }
+          }));
+        }
+        if (features[name] === toLatLng) {
+          handler = address(
+            scope,
+            attrs,
+            function (latLng) {
+              options[name] = latLng;
+              check();
+            }
+          );
+          if (handler) {
+            watched = true;
+            handlers.push(handler);
+          }
+        }
+        if (!watched && !angular.isDefined(options[name])) {
+          error(name + ' missing');
+        }
+      });
+    }
+  }
+
   angular.module('GoogleMapsNative', [])
 
     .provider('gmLibrary', function () {
@@ -173,7 +407,7 @@
       /**
        * Load script
        */
-      function load($document, $window, $q) {
+      function load($document, $window) {
         var script, callback = options.callback;
 
         if (!loading) {
@@ -210,7 +444,10 @@
         angular.extend(options, opts);
       };
 
-      this.$get = ['$document', '$window', '$rootScope', '$q', function ($document, $window, $rootScope, $q) {
+      this.$get = ['$document', '$window', '$rootScope', '$q', '$parse', '$timeout', function ($document, $window, $rootScope, _$q_, _$parse_, _$timeout_) {
+        $q =  _$q_;
+        $parse =_$parse_;
+        $timeout = _$timeout_;
         return {
           /**
            * Populate scope
@@ -225,162 +462,20 @@
            * @returns {Promise}
            */
           load: function () {
-            return load($document, $window, $q);
+            return load($document, $window);
           }
         };
       }];
     })
 
-    .factory('gmTools', ['$parse', '$timeout', 'gmLogger', function ($parse, $timeout, gmLogger) {
-      var gmTools = {
-
-        /**
-         * Bind events on google map object from attributes
-         * @param obj {Google.Maps.Object}
-         * @param scope {Scope}
-         * @param attrs {Attributes}
-         */
-        bind: function (obj, scope, attrs) {
-          angular.forEach(attrs, function (value, key) {
-            var match = key.match(/^on(ce)?[A-Z]/);
-            if (match) {
-              googleMap.event['addListener' + (match[1] ? 'Once' : '')](obj, eventName(key), function (event) {
-                $timeout(function () {
-                  scope.$apply(function () {
-                    var childScope = scope.$new(false);
-                    childScope.event = event;
-                    $parse(value)(childScope);
-                  });
-                });
-              });
-            }
-          });
-        },
-
-        /**
-         * Observe some attributes and run callback
-         * @param scope {Scope}
-         * @param attrs {Attributes}
-         * @param controller {Controller}
-         * @param features {string} space separated attribute names to observes
-         * @param callback {function} callback to run
-         * @param once {boolean} (optional, default=false) watch only one time
-         */
-        watch: function (scope, attrs, controller, features, callback, once) {
-          angular.forEach(features.split(' '), function (feature) {
-            var stop,
-              normalised = feature.toLowerCase();
-            if (normalised in attrs) {
-              stop = scope.$watch(attrs[normalised], function (value) {
-                if (angular.isDefined(value)) {
-                  if (once) {
-                    stop();
-                  }
-                  callback(value, feature);
-                }
-              });
-            }
-          });
-        },
-
-        /**
-         * Observe some attributes and run google maps generic functions (setX, setY)
-         * @param scope {Scope}
-         * @param attrs {Attributes}
-         * @param controller {Controller}
-         * @param features {string} space separated attribute names to observes
-         * @param cast {function} (optional) allow to preprocess value observed
-         * @param once {boolean} (optional, default=false) watch only one time
-         */
-        prop: function (scope, attrs, controller, features, cast, once) {
-          gmTools.watch(
-            scope,
-            attrs,
-            controller,
-            features,
-            function (value, feature) {
-              controller.then(function (obj) {
-                obj['set' + ucfirst(feature)](cast ? cast(value) : value);
-              });
-            },
-            once
-          );
-        },
-
-        /**
-         * Observe some attributes and wait all of them to run a callback
-         * @param scope {Scope}
-         * @param attrs {Attributes}
-         * @param controller {Controller}
-         * @param features {string} space separated attribute names to observes
-         * @param callback {function} callback to run
-         * @param once {boolean} (optional, default=false) watch only one time
-         */
-        wait: function (scope, attrs, controller, features, callback, once) {
-
-          var handlers = [],
-            mandatories = features.split(" "),
-            options = {};
-
-          function isComplete() {
-            var result = true;
-            angular.forEach(mandatories, function (name) {
-              result = result && options[name];
-            });
-            return result;
-          }
-
-          // evaluate options from element attribute
-          if (attrs.options) {
-            options = $parse(attrs.options)(scope);
-          }
-
-          if (isComplete()) {
-            callback(options);
-          }
-          if (!once || !isComplete()) {
-            angular.forEach(mandatories, function (feature) {
-              var normalised = feature.toLowerCase();
-
-              if (normalised in attrs) {
-                handlers.push(scope.$watch(attrs[normalised], function (value) {
-                  if (angular.isDefined(value)) {
-                    options[feature] = value;
-                    if (isComplete()) {
-                      // stop all watches
-                      if (once) {
-                        angular.forEach(handlers, function (handler) {
-                          handler();
-                        });
-                      }
-                      callback(options);
-                    }
-                  }
-                }));
-              } else if (!angular.isDefined(options[feature])) {
-                gmLogger.error(feature + ' not defined');
-              }
-            });
-          }
-        }
-      };
-      return gmTools;
-    }])
-
-    .factory('gmLogger', function () {
-      return {
-        error: function () {
-          console.error.apply(console, arguments);
-        }
-      };
-    })
-
-    .directive('gmMap', ['$q', '$timeout', '$parse', 'gmLibrary', 'gmTools', function ($q, $timeout, $parse, gmLibrary, gmTools) {
+    .directive('gmMap', ['gmLibrary', function (gmLibrary) {
       return {
         restrict: 'E',
         scope: true,
         controller: ['$scope', '$element', '$attrs', function ($scope, $element, $attrs) {
-          var map, deferred = $q.defer(),
+          var map, build,
+            self = this,
+            deferred = $q.defer(),
             target = angular.element(document.createElement('DIV'));
 
           if (!$element.css('position')) {
@@ -397,23 +492,84 @@
 
           $element.append(target);
 
+          $scope.$on("$destroy", function () {
+            if (map) {
+              map = undefined;
+              delete $scope.map;
+            } else {
+              deferred.reject();
+            }
+          });
+
           /**
            * Create the map
            */
-          this._build = once(function (element, options) {
+          build = once(function (options) {
             $timeout(function () { // wait until dom element visibility is toggled if needed
               map = new googleMap.Map(target[0], options);
               $scope.map = map;
-              gmTools.bind(map, $scope, $attrs);
+              bind(map, $scope, $attrs);
               deferred.resolve(map);
             }, 100);
           });
 
           /**
+           * Create the map
+           */
+          function create(options) {
+            var visibility = getVisibility($attrs);
+            // if map visibility is dynamic, evaluate it
+            if (visibility) {
+              $scope.$watch(visibility, function (value) {
+                if (value) {
+                  if (map) {
+                    $timeout(function () {
+                      googleMap.event.trigger(map, 'resize');
+                    });
+                  } else {
+                    build(options);
+                  }
+                }
+              });
+            } else {
+              build(options);
+            }
+          }
+
+          self.init = function () {
+            gmLibrary.load().then(function () {
+
+              gmLibrary.populate($scope);
+
+              wait(
+                $scope,
+                $attrs,
+                {center: toLatLng, zoom: toNumber},
+                function (options) {
+                  create(options);
+
+                  prop($scope, $attrs, self, 'center', toLatLng);
+
+                  prop($scope, $attrs, self, 'mapTypeId');
+
+                  prop($scope, $attrs, self, 'heading tilt zoom', toNumber);
+                },
+                true // once only
+              );
+            });
+
+            if ($attrs.gmThen) {
+              self.then(function () {
+                $parse($attrs.gmThen)($scope.$new(false));
+              });
+            }
+          };
+
+          /**
            * Append a function in the promise process
            * @param f
            */
-          this.then = function (f) {
+          self.then = function (f) {
             deferred.promise.then(f);
           };
 
@@ -421,74 +577,23 @@
            * return google map object
            * @returns {*}
            */
-          this.get = function () {
+          self.get = function () {
             return map;
           };
-
-          // Load library and populate scope
-          gmLibrary.load().then(function () {
-            gmLibrary.populate($scope);
-          });
         }],
         link: function (scope, elem, attrs, controller) {
-
-          /**
-           * Create the map
-           */
-          function create(options) {
-            var visibility = getVisibility(attrs);
-            // if map visibility is dynamic, evaluate it
-            if (visibility) {
-              scope.$watch(visibility, function (value) {
-                if (value) {
-                  var map = controller.get();
-                  if (map) {
-                    $timeout(function () {
-                      googleMap.event.trigger(map, 'resize');
-                    });
-                  } else {
-                    controller._build(elem, options);
-                  }
-                }
-              });
-            } else {
-              controller._build(elem, options);
-            }
-          }
-
-          gmLibrary.load().then(function () {
-            gmTools.wait(
-              scope,
-              attrs,
-              controller,
-              'center zoom',
-              function (options) {
-                options.center = toLatLng(options.center);
-                options.zoom = 1 * options.zoom;
-                create(options);
-
-                gmTools.prop(scope, attrs, controller, 'center', toLatLng);
-
-                gmTools.prop(scope, attrs, controller, 'mapTypeId');
-
-                gmTools.prop(scope, attrs, controller, 'heading tilt zoom', function (value) {
-                  return 1 * value;
-                });
-              },
-              true // once only
-            );
-          });
+          controller.init();
         }
       };
     }])
 
-    .service('gmOverlayBuilder', ['$q', '$timeout', '$parse', 'gmTools', function ($q, $timeout, $parse, gmTools) {
+    .service('gmOverlayBuilder', function () {
       return {
         /**
          *
          * @param buildOptions
-         *          .directive  {string}    current directive name
-         *          .name       {string}    object scope name
+         *          .directive  {string}    (optional) current directive name (default is 'gm' + cls)
+         *          .name       {string}    (optional) object scope name (default is lcfirst(cls))
          *          .cls        {string}    google.maps object class => ie: Marker for google.maps.Marker
          *          .main       {object}    (optional) main property to to wait / watch / observe before creating object
          *            .name     {string}    property name
@@ -520,7 +625,7 @@
          * @returns {Object}
          */
         builder: function (buildOptions) {
-          var require = [buildOptions.directive];
+          var require = [buildOptions.directive || 'gm' + ucfirst(buildOptions.cls.toLowerCase())];
           if (angular.isArray(buildOptions.require)) {
             Array.prototype.push.apply(require, buildOptions.require);
           } else if (buildOptions.require && angular.isString(buildOptions.require)) {
@@ -533,7 +638,10 @@
             scope: true,
             require : require,
             controller: ['$scope', '$element', '$attrs', function ($scope, $element, $attrs) {
-              var obj, deferred = $q.defer();
+              var obj, build, mapController, controllers,
+                scopeName = buildOptions.name || lcfirst(buildOptions.cls),
+                self = this,
+                deferred = $q.defer();
 
 
               /**
@@ -544,9 +652,10 @@
                   if (buildOptions.destroy) {
                     buildOptions.destroy($scope, $element, $attrs, obj);
                   } else {
-                    obj.setMap(null);
+                    obj.setMap(undefined);
                   }
-                  obj = null;
+                  obj = undefined;
+                  delete $scope[scopeName];
                 } else {
                   deferred.reject();
                 }
@@ -555,7 +664,7 @@
               /**
                * Create the object
                */
-              this._build = once(function (options, map, visible) {
+              build = once(function (options, map, visible) {
                 var opts = buildOptions.opts ? options.opts || {} : options;
                 if (!visible && opts.map) {
                   delete opts.map;
@@ -565,18 +674,93 @@
                 if (visible && !opts.map && obj.setMap) {
                   obj.setMap(map);
                 }
-                if (buildOptions.name) {
-                  $scope[buildOptions.name] = obj;
-                }
-                gmTools.bind(obj, $scope, $attrs);
+                $scope[scopeName] = obj;
+                bind(obj, $scope, $attrs);
                 deferred.resolve(obj);
+              });
+
+              /**
+               * Handle the creation the object depending on its visibility
+               */
+              function create(options) {
+                var visibility = getVisibility($attrs),
+                  map = mapController.get();
+
+                // if map visibility is dynamic, evaluate it
+                if (visibility) {
+                  $scope.$watch(visibility, function (value) {
+                    if (obj) {
+                      if (buildOptions.visibility) {
+                        buildOptions.visibility($scope, $element, $attrs, controllers, value);
+                      } else {
+                        obj.setMap(value ? map : null);
+                      }
+                    } else {
+                      build(options, map, value);
+                      if (buildOptions.visibility) {
+                        buildOptions.visibility($scope, $element, $attrs, controllers, value);
+                      }
+                    }
+                  });
+                } else {
+                  build(options, map, true);
+                }
+              }
+
+              self.init = once(function (_controllers_) {
+                controllers =_controllers_;
+                mapController = controllers[controllers.length - 1];
+
+                mapController.then(function (map) {
+                  var waitFor = {},
+                    options = {};
+
+                  // if build provide a custom constructor, use it
+                  if (buildOptions.create) {
+                    if ($attrs.options) {
+                      options = $parse($attrs.options)($scope);
+                      if (buildOptions.main && options[buildOptions.main.name]) {
+                        options[buildOptions.main.name] = buildOptions.main.cast(options[buildOptions.main.name]);
+                      }
+                    }
+                    // if it satisfy the creation, return
+                    if (buildOptions.create($scope, $element, $attrs, controllers, options, create)) {
+                      return;
+                    }
+                  }
+
+                  waitFor[buildOptions.main.name] = buildOptions.main.cast;
+                  // no custom constructor or does not satisfy the creation, so, use default one
+                  wait(
+                    $scope,
+                    $attrs,
+                    waitFor,
+                    function (options) {
+                      if (buildOptions.opts) {
+                        options.opts = options.opts || {};
+                        options.opts.map = map;
+                      } else {
+                        options.map = map;
+                      }
+                      create(options);
+                      prop($scope, $attrs, self, buildOptions.main.name, buildOptions.main.cast);
+                    },
+                    true // once only
+                  );
+                });
+
+                if ($attrs.gmThen) {
+                  self.then(function () {
+                    $parse($attrs.gmThen)($scope.$new(false));
+                  });
+                }
               });
 
               /**
                * Append a function in the promise process
                * @param f
                */
-              this.then = function (f) {
+              self.then = function (f) {
                 deferred.promise.then(f);
               };
 
@@ -584,91 +768,20 @@
                * return google map object
                * @returns {*}
                */
-              this.get = function () {
+              self.get = function () {
                 return obj;
               };
             }],
             link: function (scope, element, attrs, controllers) {
-              var controller = controllers[0],
-                mapController = controllers[controllers.length - 1];
-
-              /**
-               * Finalise object creation and bind visibility if needed
-               */
-              function create(options) {
-                var visibility = getVisibility(attrs),
-                  map = mapController.get();
-
-                // if map visibility is dynamic, evaluate it
-                if (visibility) {
-                  scope.$watch(visibility, function (value) {
-                    var obj = controller.get();
-                    if (obj) {
-                      if (buildOptions.visibility) {
-                        buildOptions.visibility(scope, element, attrs, controllers, value);
-                      } else {
-                        obj.setMap(value ? map : null);
-                      }
-                    } else {
-                      controller._build(options, map, value);
-                      if (buildOptions.visibility) {
-                        buildOptions.visibility(scope, element, attrs, controllers, value);
-                      }
-                    }
-                  });
-                } else {
-                  controller._build(options, map, true);
-                }
-              }
-
-              mapController.then(function (map) {
-                var options = {};
-
-                // if build provide a custom constructor, use it
-                if (buildOptions.create) {
-                  if (attrs.options) {
-                    options = $parse(attrs.options)(scope);
-                    if (buildOptions.main && options[buildOptions.main.name]) {
-                      options[buildOptions.main.name] = buildOptions.main.cast(options[buildOptions.main.name]);
-                    }
-                  }
-                  // if it satisfy the creation, return
-                  if (buildOptions.create(scope, element, attrs, controllers, options, create)) {
-                    return;
-                  }
-                }
-
-                // no custom contructor or does not satisfy the creation, so, use default one
-                gmTools.wait(
-                  scope,
-                  attrs,
-                  controller,
-                  buildOptions.main.name,
-                  function (options) {
-                    if (buildOptions.main.cast) {
-                      options[buildOptions.main.name] = buildOptions.main.cast(options[buildOptions.main.name]);
-                    }
-                    if (buildOptions.opts) {
-                      options.opts = options.opts || {};
-                      options.opts.map = map;
-                    } else {
-                      options.map = map;
-                    }
-                    create(options);
-                    gmTools.prop(scope, attrs, controller, buildOptions.main.name, buildOptions.main.cast);
-                  }
-                );
-              });
+              controllers[0].init(controllers);
             }
           };
         }
       };
-    }])
+    })
 
     .directive('gmMarker', ['gmOverlayBuilder', function (gmOverlayBuilder) {
       return gmOverlayBuilder.builder({
-        directive: 'gmMarker',  // current directive name
-        name: 'marker',         // scope name
         cls: 'Marker',          // google.maps object class => google.maps.Marker
         main: {                 // main property to wait / watch / observe before creating
           name: 'position',
@@ -679,8 +792,6 @@
 
     .directive('gmCircle', ['gmOverlayBuilder', function (gmOverlayBuilder) {
       return gmOverlayBuilder.builder({
-        directive: 'gmCircle',
-        name: 'circle',
         cls: 'Circle',
         main: {
           name: 'center',
@@ -691,8 +802,6 @@
 
     .directive('gmRectangle', ['gmOverlayBuilder', function (gmOverlayBuilder) {
       return gmOverlayBuilder.builder({
-        directive: 'gmRectangle',
-        name: 'rectangle',
         cls: 'Rectangle',
         main: {
           name: 'bounds',
@@ -701,10 +810,9 @@
       });
     }])
 
-    .directive('gmInfowindow', ['$parse', 'gmOverlayBuilder', 'gmTools', function ($parse, gmOverlayBuilder, gmTools) {
+    .directive('gmInfowindow', ['gmOverlayBuilder', function (gmOverlayBuilder) {
       return gmOverlayBuilder.builder({
-        directive: 'gmInfowindow',
-        require: ['^?gmMarker'],
+        require: '^?gmMarker',
         name: 'infowindow',
         cls: 'InfoWindow',
         main: {
@@ -733,15 +841,13 @@
               payload(options);
             });
           } else { // infowindow needs a position
-            gmTools.wait(
+            wait(
               scope,
               attrs,
-              controllers[0],
-              'position',
+              {position: toLatLng},
               function (options) {
-                options.position = toLatLng(options.position);
                 payload(options);
-                gmTools.prop(scope, attrs, controllers[0], 'position', toLatLng);
+                prop(scope, attrs, controllers[0], 'position', toLatLng);
               },
               true
             );
@@ -768,7 +874,7 @@
       });
     }])
 
-    .directive('gmDirections', ['$q', '$timeout', '$parse', 'gmTools', function ($q, $timeout, $parse, gmTools) {
+    .directive('gmDirections', function () {
       return {
         restrict: 'E',
         scope: true,
@@ -820,10 +926,9 @@
             mapController = controllers[1];
 
           mapController.then(function () {
-            gmTools.wait(
+            wait(
               scope,
               attrs,
-              controller,
               'origin destination travelMode',
               function (options) {
                 controller._run(options);
@@ -832,14 +937,14 @@
           });
         }
       };
-    }])
+    })
 
-    .directive('gmRenderer', ['$parse', 'gmOverlayBuilder', function ($parse, gmOverlayBuilder) {
+    .directive('gmRenderer', ['gmOverlayBuilder', function (gmOverlayBuilder) {
       return gmOverlayBuilder.builder({
         directive: 'gmRenderer',
         name: 'renderer',
         cls: 'DirectionsRenderer',
-        require: ['^gmDirections'],
+        require: '^gmDirections',
         create: function (scope, element, attrs, controllers, options, create) {
           var controller = controllers[0],
             directionsController = controllers[1],
@@ -859,8 +964,6 @@
 
     .directive('gmPolyline', ['gmOverlayBuilder', function (gmOverlayBuilder) {
       return gmOverlayBuilder.builder({
-        directive: 'gmPolyline',
-        name: 'polyline',
         cls: 'Polyline',
         main: {
           name: 'path',
@@ -876,8 +979,6 @@
 
     .directive('gmPolygon', ['gmOverlayBuilder', function (gmOverlayBuilder) {
       return gmOverlayBuilder.builder({
-        directive: 'gmPolygon',
-        name: 'polygon',
         cls: 'Polygon',
         main: {
           name: 'paths',
@@ -891,10 +992,8 @@
       });
     }])
 
-    .directive('gmGroundoverlay', ['$parse', 'gmOverlayBuilder', 'gmTools', function ($parse, gmOverlayBuilder, gmTools) {
+    .directive('gmGroundoverlay', ['gmOverlayBuilder', function (gmOverlayBuilder) {
       return gmOverlayBuilder.builder({
-        directive: 'gmGroundoverlay',
-        name: 'groundOverlay',
         cls: 'GroundOverlay',
         opts: true,
         instantiate: function (scope, element, attrs, options) {
@@ -902,10 +1001,9 @@
         },
         create: function (scope, element, attrs, controllers, options, create) {
           controllers[1].then(function () { // mapController
-            gmTools.wait(
+            wait(
               scope,
               attrs,
-              controllers[0], // current controller
               'url bounds',
               function (options) {
                 options.bounds = toLatLngBounds(options.bounds);
@@ -919,10 +1017,8 @@
       });
     }])
 
-    .directive('gmKmllayer', ['$parse', 'gmOverlayBuilder', function ($parse, gmOverlayBuilder) {
+    .directive('gmKmllayer', ['gmOverlayBuilder', function (gmOverlayBuilder) {
       return gmOverlayBuilder.builder({
-        directive: 'gmKmllayer',
-        name: 'kmlLayer',
         cls: 'KmlLayer',
         opts: true,
         main: {
@@ -959,18 +1055,124 @@
 
     .directive('gmTrafficlayer', ['gmLayerBuilder', function (gmLayerBuilder) {
       return gmLayerBuilder.builder({
-        directive: 'gmTrafficlayer',
-        name: 'trafficLayer',
         cls: 'TrafficLayer'
       });
     }])
 
     .directive('gmBicyclinglayer', ['gmLayerBuilder', function (gmLayerBuilder) {
       return gmLayerBuilder.builder({
-        directive: 'gmBicyclinglayer',
-        name: 'bicyclingLayer',
         cls: 'BicyclingLayer'
       });
+    }])
+
+    .directive('gmTransitlayer', ['gmLayerBuilder', function (gmLayerBuilder) {
+      return gmLayerBuilder.builder({
+        cls: 'TransitLayer'
+      });
+    }])
+
+    .directive('gmStreetviewpanorama', ['gmLibrary', function (gmLibrary) {
+      return {
+        restrict: 'E',
+        scope: true,
+        controller: ['$scope', '$element', '$attrs', function ($scope, $element, $attrs) {
+          var streetViewPanorama, build,
+            self = this,
+            deferred = $q.defer();
+
+          $scope.$on("$destroy", function () {
+            if (streetViewPanorama) {
+              streetViewPanorama = undefined;
+              delete $scope.streetViewPanorama;
+            } else {
+              deferred.reject();
+            }
+          });
+
+          /**
+           * Create the streetViewPanorama
+           */
+          build = once(function (options) {
+            $timeout(function () { // wait until dom element visibility is toggled if needed
+              streetViewPanorama = new googleMap.StreetViewPanorama($element[0], options);
+              $scope.streetViewPanorama = streetViewPanorama;
+              bind(streetViewPanorama, $scope, $attrs);
+              deferred.resolve(streetViewPanorama);
+            }, 100);
+          });
+
+          /**
+           * Handle the creation the streetViewPanorama depending on its visibility
+           */
+          function create(options) {
+            var visibility = getVisibility($attrs);
+            // if visibility is dynamic, evaluate it
+            if (visibility) {
+              $scope.$watch(visibility, function (value) {
+                if (value) {
+                  if (streetViewPanorama) {
+                    $timeout(function () {
+                      googleMap.event.trigger(streetViewPanorama, 'resize');
+                    });
+                  } else {
+                    build(options);
+                  }
+                }
+              });
+            } else {
+              build(options);
+            }
+          }
+
+          self.init = once(function () {
+            gmLibrary.load().then(function () {
+
+              gmLibrary.populate($scope);
+
+              wait(
+                $scope,
+                $attrs,
+                {position: toLatLng},
+                function (options) {
+                  create(options);
+
+                  prop($scope, $attrs, self, 'position', toLatLng);
+
+                  prop($scope, $attrs, self, 'pov');
+
+                  prop($scope, $attrs, self, 'zoom', toNumber);
+                },
+                true // once only
+              );
+            });
+
+            if ($attrs.gmThen) {
+              self.then(function () {
+                $parse($attrs.gmThen)($scope.$new(false));
+              });
+            }
+          });
+
+          /**
+           * Append a function in the promise process
+           * @param f
+           */
+          self.then = function (f) {
+            deferred.promise.then(f);
+          };
+
+          /**
+           * return google map object
+           * @returns {*}
+           */
+          self.get = function () {
+            return streetViewPanorama;
+          };
+        }],
+        link: function (scope, elem, attrs, controller) {
+          controller.init();
+        }
+      };
     }])
 
   ;
