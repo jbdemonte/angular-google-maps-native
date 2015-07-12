@@ -1,8 +1,1 @@
-/*!
- *  angular-google-maps-native
- *  Version   : {{version}}
- *  Date      : {{date}}
- *  Author    : DEMONTE Jean-Baptiste
- *  Contact   : jbdemonte@gmail.com
- *  Licence   : GPL v3 : http://www.gnu.org/licenses/gpl.html
- */
+/*! angular-google-maps-native v{{version}} | {{date}} | DEMONTE Jean-Baptiste | jbdemonte@gmail.com | GPL v3 */
