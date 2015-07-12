@@ -23,6 +23,7 @@
   "ignore": [
     "*.json",
     "assets",
+    "tests",
     "examples",
     "src",
     "gulpfile.js",
