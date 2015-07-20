@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html ng-app="MyApp">
+<head lang="en">
+  <meta charset="UTF-8">
+  <link rel="stylesheet" type="text/css" href="assets/style.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+  <script src="../dist/angular-google-maps-native.js"></script>
+  <script>
+    angular.module('MyApp', ['GoogleMapsNative'])
+
+      .config(function(gmLibraryProvider) {
+        gmLibraryProvider.configure({
+          language: 'fr',
+          libraries: ['places']
+        });
+      })
+
+      .controller('MyCtrl', function ($scope) {
+          var infowindow, google;
+
+          $scope.places = [];
+
+          $scope.getPlace = function (map) {
+            google = $scope.google;
+
+            var service = new google.maps.places.PlacesService(map),
+                request = {
+                  location: map.getCenter(),
+                  radius: 500,
+                  types: ['store']
+                };
+
+            service.nearbySearch(request, function (results, status) {
+              $scope.$apply(function () {
+                if (status == google.maps.places.PlacesServiceStatus.OK) {
+                  for (var i = 0; i < results.length; i++) {
+                    $scope.places.push(results[i]);
+                  }
+                }
+              });
+            });
+
+          };
+
+          $scope.show = function (map, marker, place) {
+            infowindow = infowindow || new google.maps.InfoWindow(); // easier to use object than gm-infowindow directive there
+            infowindow.setContent(place.name);
+            infowindow.open(map, marker);
+          }
+      })
+
+    ;
+
+  </script>
+</head>
+<body ng-controller="MyCtrl">
+  <h1>
+    Example of use of the Place library
+  </h1>
+  <p>
+    Based on the official <a href="https://developers.google.com/maps/documentation/javascript/examples/place-search">example</a>.
+  </p>
+
+  <gm-map options="{center: [-33.8665433, 151.1956316], zoom: 15}" gm-then="getPlace(map)">
+
+    <gm-marker
+        ng-repeat="place in places" options="{position: place.geometry.location}"
+        on-click="show(map, marker, place)"
+        >
+    </gm-marker>
+
+  </gm-map>
+
+</body>
+</html>
