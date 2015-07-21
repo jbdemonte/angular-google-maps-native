@@ -2,7 +2,17 @@
 
 [![NPM version][npm-image]][npm-url] [![Bower version][bower-image]][bower-url] [![Build Status][travis-image]][travis-url] [![Coverage Status][coverage-image]][coverage-url]
 
-AngularJS directives for the Google Maps Javascript API using the native way.
+## About
+
+**angular-google-maps-native** is a module for the [AngularJS](http://angularjs.org/) framework.
+
+It provides the Google Maps JavaScript API an easy and intuitive way. You won't have to learn a complex dedicated syntax.  
+Just use Google Maps, the AngularJS way.
+
+If you like this plugin give it a thumbs up at [ngmodules](http://ngmodules.org/modules/angular-google-maps-native) or get me a [beer](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=WCUX27CFV79S2).
+
+
+## Documentation
 
 [Project page](http://jbdemonte.github.io/angular-google-maps-native/)
 
