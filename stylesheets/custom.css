@@ -67,6 +67,7 @@ snippets-tabs nav {
 snippets-tabs .btn {
   font-size: 14px;
   padding: 6px 12px;
+  margin-top: 0 !important;
 }
 snippets-tabs .btn:hover {
   color: #000;
