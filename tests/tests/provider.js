@@ -92,6 +92,9 @@ describe('Provider', function () {
 
     expect($window.__callback).not.to.be.an('undefined');
 
+    // inject google library
+    $window.google = $window.mokeGoogle;
+
     // simulate load end
     $window.__callback();
 
@@ -106,6 +109,127 @@ describe('Provider', function () {
 
     // test provide function
     expect($rootScope.google).to.deep.equal($window.google);
+
+    // clean for next test
+    delete $window.google;
+
+  });
+
+  it('tests library already loaded', function () {
+
+    // pre-inject google library (user may have set it by its own in the head section)
+    $window.google = $window.mokeGoogle;
+
+    var called = false,
+      options = {
+        url: 'http://url',
+        v: "3.1",
+        libraries: ['test', 'test2'],
+        language: 'en',
+        sensor: 'false',
+        whatever: '123',
+        callback: '__callback'
+      };
+
+    expect(provider).not.to.be.an('undefined');
+
+    provider.configure(options);
+
+    gmLibrary = provider.$get[6]($document, $window, $rootScope, $q, $parse, $timeout);
+
+    // just to be sure of the test
+    expect($window.__callback).to.be.an('undefined');
+
+    gmLibrary.load().then(function () {
+      called = true;
+      gmLibrary.populate($rootScope);
+    });
+
+    // loading should not create a callback and reuse the existing google maps library
+    expect($window.__callback).to.be.an('undefined');
+
+    expect(called).to.be.equal(false);
+
+    // required for promise to be resolved
+    $rootScope.$digest();
+
+    // and promise should be resolved
+    expect(called).to.be.equal(true);
+
+    // test provide function
+    expect($rootScope.google).to.deep.equal($window.google);
+
+    // clean for next test
+    delete $window.google;
+
+  });
+
+  it('tests library already loaded delayed', function () {
+
+    var deferred;
+
+    // pre-inject google library (user may have set it by its own in the head section)
+    $window.google = $window.mokeGoogle;
+
+    var called = false,
+      options = {
+        url: 'http://url',
+        v: "3.1",
+        libraries: ['test', 'test2'],
+        language: 'en',
+        sensor: 'false',
+        whatever: '123',
+        callback: '__callback',
+        load: function (aDeferred) {
+          deferred = aDeferred;
+        }
+      };
+
+    expect(provider).not.to.be.an('undefined');
+
+    provider.configure(options);
+
+    gmLibrary = provider.$get[6]($document, $window, $rootScope, $q, $parse, $timeout);
+
+    // just to be sure of the test
+    expect($window.__callback).to.be.an('undefined');
+
+    expect(deferred).to.be.an('undefined');
+
+    gmLibrary.load().then(function () {
+      called = true;
+      gmLibrary.populate($rootScope);
+    });
+
+    // loading should not create a callback and reuse the existing google maps library
+    expect($window.__callback).to.be.an('undefined');
+
+    // custom load function should be called and deffered set
+    expect(deferred).not.to.be.an('undefined');
+
+    // library should still be waited
+    expect(called).to.be.equal(false);
+
+    // Let try it once
+    $rootScope.$digest();
+
+    // Nothing should happen
+    expect(called).to.be.equal(false);
+
+    // let's call the load end
+    deferred.resolve();
+
+    // required for promise to be resolved
+    $rootScope.$digest();
+
+    // and promise should be resolved
+    expect(called).to.be.equal(true);
+
+    // test provide function
+    expect($rootScope.google).to.deep.equal($window.google);
+
+    // clean for next test
+    delete $window.google;
 
   });
 

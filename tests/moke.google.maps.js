@@ -1,4 +1,4 @@
-var google = (function () {
+var mokeGoogle = (function () {
 
   function ucfirst(str) {
     str += '';

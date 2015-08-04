@@ -415,21 +415,29 @@
           // create the deferred which may be used more than once
           deferred = $q.defer();
 
-          // callback function - resolving promise after maps successfully loaded
-          $window[callback] = function () {
-            delete $window[callback];
-            googleMap = $window.google.maps;
-            if (!googleMap) {
-              throw "google.maps library not found";
-            }
+          // user already load google maps libraries, so, we have to trust him (even regarding libraries) because library
+          // can't be loaded more than once else trigger errors
+          if ($window.google && $window.google.maps) {
             deferred.resolve();
-          };
+            googleMap = $window.google.maps;
+          } else {
 
-          // append script to dom
-          script = $document[0].createElement('script');
-          script.type = 'text/javascript';
-          script.src = url();
-          $document.find("body").append(script);
+            // callback function - resolving promise after maps successfully loaded
+            $window[callback] = function () {
+              delete $window[callback];
+              googleMap = $window.google.maps;
+              if (!googleMap) {
+                throw "google.maps library not found";
+              }
+              deferred.resolve();
+            };
+
+            // append script to dom
+            script = $document[0].createElement('script');
+            script.type = 'text/javascript';
+            script.src = url();
+            $document.find("body").append(script);
+          }
         }
 
         return deferred.promise;
@@ -453,15 +461,24 @@
            * @param scope
            */
           populate: function (scope) {
-            scope.google = google;
-            $rootScope.google = google;
+            scope.google = $window.google;
+            $rootScope.google = $window.google;
           },
           /**
            * Async load google map library
            * @returns {Promise}
            */
           load: function () {
-            return load($document, $window);
+            var deferred;
+            if (options.load) {
+              deferred = $q.defer();
+              options.load(deferred);
+              return deferred.promise.then(function () {
+                return load($document, $window);
+              })
+            } else {
+              return load($document, $window);
+            }
           }
         };
       }];

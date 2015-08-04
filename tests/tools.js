@@ -25,8 +25,6 @@ var testTools = {
       $timeout = _$timeout_;
     }));
 
-
-
     beforeEach(function(){
 
       var gmLibrary;
@@ -42,6 +40,8 @@ var testTools = {
         gmLibrary.populate($rootScope);
       });
 
+      $window.google = $window.mokeGoogle;
+
       // simulate load ends
       $window.__callback();
 
@@ -49,7 +49,13 @@ var testTools = {
       $rootScope.$digest();
 
       expect($rootScope.google).not.to.be.an('undefined');
+
     });
+
+    afterEach(function () {
+      delete $window.google;
+    });
+
   },
 
   test: {
