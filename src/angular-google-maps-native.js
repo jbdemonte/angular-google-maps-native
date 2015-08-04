@@ -67,16 +67,22 @@
    * Convert mix LatLng to a new google.maps.LatLng
    * @param mixed {*} LatLng, [lat, lng], {lat: number, lng: number}
    * @param returnMixed {boolean} (optional, default = false) if true and no result, return mixed
-   * @returns {LatLng|*|null}
+   * @returns {LatLng|*|undefined}
    */
-  function toLatLng(mixed, returnMixed) {
-    var result = returnMixed ? mixed : null;
+  function toLatLng(mixed) {
+    var lat, lng, result;
     if (mixed instanceof googleMap.LatLng) {
-      result = mixed;
-    } else if (angular.isArray(mixed)) {
-      result = new googleMap.LatLng(mixed[0], mixed[1]);
-    } else if (angular.isObject(mixed) && 'lat' in mixed) {
-      result = new googleMap.LatLng(mixed.lat, mixed.lng);
+      return mixed;
+    }
+    if (angular.isArray(mixed)) {
+      lat = toNumber(mixed[0]);
+      lng = toNumber(mixed[1]);
+    } else if (angular.isObject(mixed)) {
+      lat = toNumber(mixed.lat);
+      lng = toNumber(mixed.lng);
+    }
+    if (angular.isDefined(lat) && angular.isDefined(lng)) {
+      result = new googleMap.LatLng(lat, lng);
     }
     return result;
   }
@@ -87,7 +93,10 @@
    * @returns {number}
    */
   function toNumber(value) {
-    return 1 * value;
+    value = 1 * value;
+    if (!isNaN(value)) {
+      return value;
+    }
   }
 
   /**
@@ -97,9 +106,9 @@
    * @returns {*}
    */
   function toLatLngBounds(mixed) {
-    var ne, sw;
+    var ne, sw, result;
     if (!mixed || mixed instanceof googleMap.LatLngBounds) {
-      return mixed || null;
+      return mixed || undefined;
     }
     if (angular.isArray(mixed)) {
       if (mixed.length === 2) {
@@ -119,9 +128,9 @@
       }
     }
     if (ne && sw) {
-      return new googleMap.LatLngBounds(sw, ne);
+      result = new googleMap.LatLngBounds(sw, ne);
     }
-    return null;
+    return result;
   }
 
 
@@ -238,7 +247,10 @@
 
       function callback(value) {
         controller.then(function (obj) {
-          obj['set' + ucfirst(feature)](cast ? cast(value) : value);
+          value = cast ? cast(value) : value;
+          if (angular.isDefined(value)) {
+            obj['set' + ucfirst(feature)](value);
+          }
         });
       }
 
@@ -283,31 +295,24 @@
     }
 
     /**
-     * cast values if needed and run callback
-     */
-    function call() {
-      angular.forEach(features, function (cast, name) {
-        if (cast) {
-          options[name] = cast(options[name]);
-        }
-      });
-      callback(options);
-    }
-
-    /**
      * Return True if all mandatories are provided
      * @returns {boolean}
      */
     function isComplete() {
       var result = true;
       angular.forEach(mandatories, function (name) {
-        result = result && options[name];
+        // cast if needed
+        if (angular.isDefined(options[name]) && features[name]) {
+          options[name] = features[name](options[name]);
+        }
+        result = result && angular.isDefined(options[name]);
       });
       return result;
     }
 
     /**
      * Test mandatories, unbind if needed and run callback handler
+     * Return True if process is finished
      */
     function check() {
       if (isComplete()) {
@@ -317,7 +322,8 @@
             handler();
           });
         }
-        call();
+        callback(options);
+        return once;
       }
     }
 
@@ -326,11 +332,7 @@
       options = $parse(attrs.options)(scope);
     }
 
-    if (isComplete()) {
-      call();
-    }
-
-    if (!once || !isComplete()) {
+    if (!check()) {
       angular.forEach(mandatories, function (name) {
         var watched = false,
           normalised = name.toLowerCase();
@@ -903,8 +905,8 @@
             };
 
           this._run = function (options) {
-            options.origin = toLatLng(options.origin, true);
-            options.destination = toLatLng(options.destination, true);
+            options.origin = toLatLng(options.origin) || options.origin;
+            options.destination = toLatLng(options.destination) || options.destination;
             services('DirectionsService').route(
               options,
               function (results, status) {

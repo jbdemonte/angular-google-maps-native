@@ -44,12 +44,18 @@ describe('gmRectangle', function () {
   });
 
 
-  it('wait for bounds', function () {
+  it('wait for valid bounds', function () {
     compile('<gm-rectangle bounds="bounds"></gm-rectangle>');
     expect(scope.map instanceof googleMaps.Map).to.be.equal(true);
     expect(scope.rectangle instanceof googleMaps.Rectangle).to.be.equal(false);
+    $scope.bounds = [1, 2, 'a', 4];
+    $scope.$digest();
+    expect(scope.rectangle).to.be.an('undefined');
+
     $scope.bounds = [1, 2, 3, 4];
     $scope.$digest();
+    expect(scope.rectangle).not.to.be.an('undefined');
+
     expect(scope.rectangle instanceof googleMaps.Rectangle).to.be.equal(true);
     testTools.test.latLngBounds(scope.rectangle.getBounds(), 1, 2, 3, 4);
   });

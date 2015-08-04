@@ -42,18 +42,25 @@ describe('gmMap', function () {
     expect(scope.map instanceof googleMaps.Map).to.be.equal(true);
   });
 
-  it('wait for center and zoom', function () {
+  it('wait for valid center and zoom', function () {
     compile('<gm-map center="center" zoom="zoom"></gm-map>');
     expect(scope.map instanceof googleMaps.Map).to.be.equal(false);
 
     expect(scope.map).to.be.an('undefined');
 
-    $scope.center = [37, -122];
+    $scope.center = [];
+    $scope.zoom = 'a';
     $scope.$digest();
 
     expect(scope.map).to.be.an('undefined');
 
     $scope.zoom = 4;
+    $scope.$digest();
+    testTools.test.noFlush($timeout);
+
+    expect(scope.map).to.be.an('undefined');
+
+    $scope.center = [37, -122];
     $scope.$digest();
     $timeout.flush();
 
