@@ -62,6 +62,15 @@
     return (attrs.ngShow ? '(' + attrs.ngShow + ')' : '') + (attrs.ngHide ? (attrs.ngShow ? ' && ' : '') + '!(' + attrs.ngHide + ')' : '') || '';
   }
 
+  /**
+   * No operation cast
+   * @param value
+   * @returns {*}
+   */
+  function toNop(value) {
+    return value;
+  }
+
 
   /**
    * Convert mix LatLng to a new google.maps.LatLng
@@ -614,8 +623,9 @@
          *          .name       {string}    (optional) object scope name (default is lcfirst(cls))
          *          .cls        {string}    google.maps object class => ie: Marker for google.maps.Marker
          *          .main       {object}    (optional) main property to to wait / watch / observe before creating object
-         *            .name     {string}    property name
-         *            .cast     {function}  (optional) preprocess value
+         *                [name]: cast
+         *                  name     {string}    property name
+         *                  cast     {function}  (optional) preprocess value
          *          .opts       {boolean}   use a subobject (opts) as options constructor (default = false)
          *          .require    {array|string} additional constructor to require
          *          .destroy    {function(scope, element, attrs, object)} kinda destructor
@@ -730,16 +740,17 @@
                 mapController = controllers[controllers.length - 1];
 
                 mapController.then(function (map) {
-                  var waitFor = {},
-                    options = {};
+                  var options = {};
 
                   // if build provide a custom constructor, use it
                   if (buildOptions.create) {
                     if ($attrs.options) {
                       options = $parse($attrs.options)($scope);
-                      if (buildOptions.main && options[buildOptions.main.name]) {
-                        options[buildOptions.main.name] = buildOptions.main.cast(options[buildOptions.main.name]);
-                      }
+                      angular.forEach(buildOptions.main, function (cast, name) {
+                        if (name in options) {
+                          options[name] = cast(options[name]);
+                        }
+                      });
                     }
                     // if it satisfy the creation, return
                     if (buildOptions.create($scope, $element, $attrs, controllers, options, create)) {
@@ -747,12 +758,11 @@
                     }
                   }
 
-                  waitFor[buildOptions.main.name] = buildOptions.main.cast;
                   // no custom constructor or does not satisfy the creation, so, use default one
                   wait(
                     $scope,
                     $attrs,
-                    waitFor,
+                    buildOptions.main,
                     function (options) {
                       if (buildOptions.opts) {
                         options.opts = options.opts || {};
@@ -761,7 +771,9 @@
                         options.map = map;
                       }
                       create(options);
-                      prop($scope, $attrs, self, buildOptions.main.name, buildOptions.main.cast);
+                      angular.forEach(buildOptions.main, function (cast, name) {
+                        prop($scope, $attrs, self, name, cast);
+                      });
                     },
                     true // once only
                   );
@@ -802,8 +814,7 @@
       return gmOverlayBuilder.builder({
         cls: 'Marker',          // google.maps object class => google.maps.Marker
         main: {                 // main property to wait / watch / observe before creating
-          name: 'position',
-          cast: toLatLng
+          position: toLatLng
         }
       });
     }])
@@ -812,8 +823,8 @@
       return gmOverlayBuilder.builder({
         cls: 'Circle',
         main: {
-          name: 'center',
-          cast: toLatLng
+          center: toLatLng,
+          radius: toNumber
         }
       });
     }])
@@ -822,8 +833,7 @@
       return gmOverlayBuilder.builder({
         cls: 'Rectangle',
         main: {
-          name: 'bounds',
-          cast: toLatLngBounds
+          bounds: toLatLngBounds
         }
       });
     }])
@@ -834,8 +844,7 @@
         name: 'infowindow',
         cls: 'InfoWindow',
         main: {
-          name: 'position',
-          cast: toLatLng
+          position: toLatLng
         },
         destroy: function ($scope, $element, $attrs, infowindow) {
           infowindow.close();
@@ -984,8 +993,7 @@
       return gmOverlayBuilder.builder({
         cls: 'Polyline',
         main: {
-          name: 'path',
-          cast: function (path) {
+          path: function (path) {
             angular.forEach(path, function (value, index) {
               path[index] = toLatLng(value);
             });
@@ -999,8 +1007,7 @@
       return gmOverlayBuilder.builder({
         cls: 'Polygon',
         main: {
-          name: 'paths',
-          cast: function (paths) {
+          paths: function (paths) {
             angular.forEach(paths, function (value, index) {
               paths[index] = toLatLng(value);
             });
@@ -1040,7 +1047,7 @@
         cls: 'KmlLayer',
         opts: true,
         main: {
-          name: 'url'
+          url: toNop
         },
         instantiate: function (scope, element, attrs, options) {
           return new googleMap.KmlLayer(options.url, options.opts);

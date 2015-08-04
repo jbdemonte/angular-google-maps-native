@@ -52,7 +52,7 @@ describe('gm-then', function () {
         '<gm-marker options="{position: map.getCenter()}" gm-then="data.marker = data.marker + 1">' +
           '<gm-infowindow gm-then="data.infowindow = data.infowindow + 1; objects.infowindow = infowindow"></gm-infowindow>' +
         '</gm-marker>' +
-        '<gm-circle options="{center: map.getCenter()}" gm-then="data.circle = data.circle + 1; objects.circle = circle"></gm-circle>' +
+        '<gm-circle options="{center: map.getCenter(), radius: 100000}" gm-then="data.circle = data.circle + 1; objects.circle = circle"></gm-circle>' +
         '<gm-trafficLayer gm-then="data.trafficLayer = data.trafficLayer + 1; objects.trafficLayer = trafficLayer"></gm-trafficLayer>' +
         '<gm-bicyclingLayer gm-then="data.bicyclingLayer = data.bicyclingLayer + 1; objects.bicyclingLayer = bicyclingLayer"></gm-bicyclingLayer>' +
         '<gm-transitLayer gm-then="data.transitLayer = data.transitLayer + 1; objects.transitLayer = transitLayer"></gm-transitLayer>' +

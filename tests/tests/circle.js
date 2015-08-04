@@ -36,7 +36,7 @@ describe('gmCircle', function () {
   }
 
   it('test simple case', function () {
-    compile('<gm-circle options="{center: [1,2]}"></gm-circle>');
+    compile('<gm-circle options="{center: [1,2], radius: 100000}"></gm-circle>');
     expect(scope.map instanceof googleMaps.Map).to.be.equal(true);
     expect(scope.circle instanceof googleMaps.Circle).to.be.equal(true);
     expect(scope.circle.getMap() === scope.map).to.be.equal(true);
@@ -44,21 +44,30 @@ describe('gmCircle', function () {
   });
 
   it('use map.center', function () {
-    compile('<gm-circle options="{center: map.getCenter()}"></gm-circle>');
+    compile('<gm-circle options="{center: map.getCenter(), radius: 100000}"></gm-circle>');
     expect(scope.map instanceof googleMaps.Map).to.be.equal(true);
     expect(scope.circle instanceof googleMaps.Circle).to.be.equal(true);
     testTools.test.latLng(scope.circle.getCenter(), scope.map.getCenter());
   });
 
-
   it('wait for center', function () {
-    compile('<gm-circle center="pos"></gm-circle>');
+    compile('<gm-circle center="pos" options="{radius: 100000}"></gm-circle>');
     expect(scope.map instanceof googleMaps.Map).to.be.equal(true);
     expect(scope.circle instanceof googleMaps.Circle).to.be.equal(false);
     $scope.pos = [1, 2];
     $scope.$digest();
     expect(scope.circle instanceof googleMaps.Circle).to.be.equal(true);
     testTools.test.latLng(scope.circle.getCenter(), 1, 2);
+  });
+
+  it('wait for radius', function () {
+    compile('<gm-circle radius="radius" options="{center: map.getCenter(),}"></gm-circle>');
+    expect(scope.map instanceof googleMaps.Map).to.be.equal(true);
+    expect(scope.circle instanceof googleMaps.Circle).to.be.equal(false);
+    $scope.radius = 10000;
+    $scope.$digest();
+    expect(scope.circle instanceof googleMaps.Circle).to.be.equal(true);
+    expect(scope.circle.getRadius()).to.be.equal($scope.radius);
   });
 
   it('test events', function () {
@@ -76,7 +85,7 @@ describe('gmCircle', function () {
       'once-click="data.clickedOnce = data.clickedOnce + 1" ' +
         // test with name not normalized
       'on-center_changed = "data.centerChanged = data.centerChanged + 1" ' +
-      'options="{center: [1, 2]}"></gm-circle>');
+      'options="{center: [1, 2], radius: 100000}"></gm-circle>');
 
     expect(scope.map instanceof googleMaps.Map).to.be.equal(true);
 
@@ -95,7 +104,7 @@ describe('gmCircle', function () {
 
   it('test ng-show', function () {
 
-    compile('<gm-circle ng-show="visible" options="{center: [1, 2]}"></gm-circle>');
+    compile('<gm-circle ng-show="visible" options="{center: [1, 2], radius: 100000}"></gm-circle>');
     expect(scope.map instanceof googleMaps.Map).to.be.equal(true);
     expect(scope.circle instanceof googleMaps.Circle).to.be.equal(true);
     expect(scope.circle.getMap()).to.be.an('undefined');
@@ -117,7 +126,7 @@ describe('gmCircle', function () {
 
     $scope.hidden = true;
 
-    compile('<gm-circle ng-hide="hidden" options="{center: [1, 2]}"></gm-circle>');
+    compile('<gm-circle ng-hide="hidden" options="{center: [1, 2], radius: 100000}"></gm-circle>');
     expect(scope.map instanceof googleMaps.Map).to.be.equal(true);
     expect(scope.circle instanceof googleMaps.Circle).to.be.equal(true);
     expect(scope.circle.getMap()).to.be.an('undefined');

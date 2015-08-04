@@ -37,7 +37,7 @@ describe('scope', function () {
   it('test child scope "isolation"', function () {
     var marker, circle, markerScope, circleScope;
 
-    compile('<gm-marker options="{position: [1,2]}"></gm-marker><gm-circle options="{center: [1,2]}"></gm-circle>');
+    compile('<gm-marker options="{position: [1,2]}"></gm-marker><gm-circle options="{center: [1,2], radius: 100000}"></gm-circle>');
     expect(scope.google).not.to.be.an('undefined');
     expect(scope.map instanceof googleMaps.Map).to.be.equal(true);
     expect(scope.marker).to.be.an('undefined');
@@ -78,7 +78,7 @@ describe('scope', function () {
     element = $compile(
       '<gm-map options="{center: [37, -122], zoom: 8}" on-click="data.map = data.map + 1">' +
         '<gm-marker options="{position: [1,2]}" on-click="data.marker = data.marker + 1"></gm-marker>' +
-        '<gm-circle options="{center: [1,2]}"  on-click="data.circle = data.circle + 1"></gm-circle>' +
+        '<gm-circle options="{center: [1,2], radius: 100000}"  on-click="data.circle = data.circle + 1"></gm-circle>' +
       '</gm-map>'
     )($scope);
 
