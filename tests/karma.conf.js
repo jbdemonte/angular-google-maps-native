@@ -29,7 +29,7 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      'dist/angular-google-maps-native.js': ['coverage']
+      'src/angular-google-maps-native.js': ['coverage']
     },
 
     coverageReporter: {
