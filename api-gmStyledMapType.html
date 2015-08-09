@@ -1,0 +1,34 @@
+---
+layout: api
+title: "StyledMapType"
+---
+
+<h2 version="2.0.0">gm-styledMapType</h2>
+
+<p>
+  Because of this google specific type of overlay, <em>gm-styledMapType</em> does not provide any binding support. <br />
+  Once initialised, there is no way to update or remove it.<br />
+</p>
+
+<strong>Parent</strong>
+<ul><li><a href="api-gmMap.html">map</a></li></ul>
+
+<strong>Scope</strong>
+<p><em>None</em></p>
+
+<strong>Parameters</strong>
+<params>
+  <item name="id" type="string">
+    id of the style to in the <doc to="MapTypeRegistry">map.mapTypes.set</doc> method
+  </item>
+  <item name="styles" type="expression">
+    Array of <doc>MapTypeStyle</doc>
+  </item>
+  <item name="options" type="expression" optional>
+    <doc>StyledMapTypeOptions</doc>
+  </item>
+</params>
+
+<strong>Example:</strong>
+
+<snippets path="snippets/api-styledMapType"></snippets>
