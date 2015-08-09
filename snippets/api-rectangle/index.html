@@ -2,7 +2,7 @@
 layout: api-snippets
 ---
 {% raw %}
-<body>
+<body ng-init="showRectangle=true">
 <label><input type="checkbox" ng-model="showRectangle"> Show the rectangle</label>
 
 <gm-map options="{center: [40.76,-73.95], zoom: 12, mapTypeId: google.maps.MapTypeId.ROADMAP}">
