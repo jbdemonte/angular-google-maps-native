@@ -617,7 +617,7 @@
         },
         buildOptions
       )
-    )
+    );
   }
 
   angular.module('GoogleMapsNative', [])
@@ -1093,6 +1093,19 @@
           return new googleMap.KmlLayer(options.url, options.opts);
         }
       });
+    })
+
+    .directive('gmStyledmaptype', function () {
+      return {
+        restrict: 'E',
+        require: '^gmMap',
+        link: function (scope, elem, attrs, mapController) {
+          mapController.then(function (map) {
+            scope.map = map;
+            map.mapTypes.set(attrs.id, new googleMap.StyledMapType($parse(attrs.styles)(scope), attrs.options ? $parse(attrs.options)(scope) : undefined));
+          })
+        }
+      };
     })
 
     .directive('gmTrafficlayer', function () {

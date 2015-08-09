@@ -47,8 +47,16 @@ var mokeGoogle = (function () {
   maps.Map = createGenericObject({
     prop: 'center div heading mapTypeId projection streetView tilt zoom options',
     constructor: function (mapDiv, options) {
-      this.__data.__mapDiv = mapDiv;
-      angular.extend(this.__data, options);
+      var self = this;
+      self.__data.__mapDiv = mapDiv;
+      self.__data.__mapTypes = [];
+      angular.extend(self.__data, options);
+
+      this.mapTypes = {
+        set: function (id, styles) {
+          self.__data.__mapTypes.push({id: id, styles: styles});
+        }
+      }
     }
   });
 
@@ -134,6 +142,13 @@ var mokeGoogle = (function () {
     constructor: function (url, options) {
       this.__data.url = url;
       angular.extend(this.__data, options);
+    }
+  });
+
+  maps.StyledMapType = createGenericObject({
+    constructor: function (styles, options) {
+      this.__data.styles = styles;
+      this.__data.options = options;
     }
   });
 

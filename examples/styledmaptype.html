@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html ng-app="MyApp">
+<head lang="en">
+  <meta charset="UTF-8">
+  <link rel="stylesheet" type="text/css" href="assets/style.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+  <script src="../dist/angular-google-maps-native.min.js"></script>
+  <script>
+    angular.module('MyApp', ['GoogleMapsNative'])
+      .controller('main', function ($scope) {
+        // easier to define it as an object in the scope :)
+        $scope.style2 = [
+          {
+            featureType: "road.highway",
+            elementType: "geometry",
+            stylers: [
+              { hue: "#ff0022" },
+              { saturation: 60 },
+              { lightness: -20 }
+            ]
+          },{
+            featureType: "road.arterial",
+            elementType: "all",
+            stylers: [
+              { hue: "#2200ff" },
+              { lightness: -40 },
+              { visibility: "simplified" },
+              { saturation: 30 }
+            ]
+          },{
+            featureType: "road.local",
+            elementType: "all",
+            stylers: [
+              { hue: "#f6ff00" },
+              { saturation: 50 },
+              { gamma: 0.7 },
+              { visibility: "simplified" }
+            ]
+          }
+        ]
+      });
+
+  </script>
+</head>
+<body ng-controller="main">
+
+<gm-map options="{center: [41.850033, -87.650052], zoom: 12, mapTypeId: google.maps.MapTypeId.ROADMAP, mapTypeControlOptions: {mapTypeIds: [google.maps.MapTypeId.ROADMAP, 'style1', 'style2']}}">
+
+  <gm-styledMapType id="style1" options="{name: 'Style 1'}" styles="[{featureType: 'road.highway', elementType: 'geometry', stylers: [ { hue: '#ff0022' }, { saturation: 60 }, { lightness: -20 } ]}]"></gm-styledMapType>
+  <gm-styledMapType id="style2" options="{name: 'Style 2'}" styles="style2"></gm-styledMapType>
+
+</gm-map>
+
+</body>
+</html>
