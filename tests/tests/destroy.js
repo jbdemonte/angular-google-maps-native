@@ -40,7 +40,7 @@ describe('destroy', function () {
     element = $compile(
       '<div>' + // http://stackoverflow.com/questions/24246811/testing-ng-if-using-compile
         '<gm-map ng-if="ifMap" options="{center: [37, -122], zoom: 8}">' +
-          '<gm-marker ng-if="ifMarker" options="{position: map.getCenter()}">' +
+          '<gm-marker ng-if="ifMarker" position="map.getCenter()">' +
             '<gm-infowindow ng-if="ifInfowindow"></gm-infowindow>' +
           '</gm-marker>' +
         '</gm-map>' +

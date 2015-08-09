@@ -54,9 +54,8 @@ describe('LatLngBounds', function () {
   });
 
   it('test array of LatLng', function () {
-    $scope.latLng1 = new googleMaps.LatLng(5, 6);
-    $scope.latLng2 = new googleMaps.LatLng(7, 8);
-    compile('<gm-rectangle options="{bounds: [latLng1, latLng2]}"></gm-rectangle>');
+    $scope.bounds = [new googleMaps.LatLng(5, 6), new googleMaps.LatLng(7, 8)];
+    compile('<gm-rectangle bounds="bounds"></gm-rectangle>');
     expect(scope.rectangle instanceof googleMaps.Rectangle).to.be.equal(true);
     testTools.test.latLngBounds(scope.rectangle.getBounds(), 5, 6, 7, 8);
   });
@@ -80,16 +79,15 @@ describe('LatLngBounds', function () {
   });
 
   it('test literal ne, sw LatLng', function () {
-    $scope.latLng1 = new googleMaps.LatLng(5, 6);
-    $scope.latLng2 = new googleMaps.LatLng(7, 8);
-    compile('<gm-rectangle options="{bounds: {ne: latLng1, sw: latLng2}}"></gm-rectangle>');
+    $scope.bounds = {ne: new googleMaps.LatLng(5, 6), sw: new googleMaps.LatLng(7, 8)};
+    compile('<gm-rectangle bounds="bounds"></gm-rectangle>');
     expect(scope.rectangle instanceof googleMaps.Rectangle).to.be.equal(true);
     testTools.test.latLngBounds(scope.rectangle.getBounds(), 5, 6, 7, 8);
   });
 
   it('test google.maps.LatLngBounds', function () {
     $scope.bounds = new googleMaps.LatLngBounds(new googleMaps.LatLng(3, 4), new googleMaps.LatLng(1, 2));
-    compile('<gm-rectangle options="{bounds: bounds}"></gm-rectangle>');
+    compile('<gm-rectangle bounds="bounds"></gm-rectangle>');
     expect(scope.rectangle instanceof googleMaps.Rectangle).to.be.equal(true);
     testTools.test.latLngBounds(scope.rectangle.getBounds(), 1, 2, 3, 4);
   });

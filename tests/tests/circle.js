@@ -44,7 +44,7 @@ describe('gmCircle', function () {
   });
 
   it('use map.center', function () {
-    compile('<gm-circle options="{center: map.getCenter(), radius: 100000}"></gm-circle>');
+    compile('<gm-circle center="map.getCenter()" options="{radius: 100000}"></gm-circle>');
     expect(scope.map instanceof googleMaps.Map).to.be.equal(true);
     expect(scope.circle instanceof googleMaps.Circle).to.be.equal(true);
     testTools.test.latLng(scope.circle.getCenter(), scope.map.getCenter());
@@ -61,7 +61,7 @@ describe('gmCircle', function () {
   });
 
   it('wait for radius', function () {
-    compile('<gm-circle radius="radius" options="{center: map.getCenter(),}"></gm-circle>');
+    compile('<gm-circle radius="radius" center="map.getCenter()"></gm-circle>');
     expect(scope.map instanceof googleMaps.Map).to.be.equal(true);
     expect(scope.circle instanceof googleMaps.Circle).to.be.equal(false);
     $scope.radius = 10000;

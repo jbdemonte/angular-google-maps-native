@@ -44,7 +44,7 @@ describe('gmMarker', function () {
   });
 
   it('use map.center', function () {
-    compile('<gm-marker options="{position: map.getCenter()}"></gm-marker>');
+    compile('<gm-marker position="map.getCenter()"></gm-marker>');
     expect(scope.map instanceof googleMaps.Map).to.be.equal(true);
     expect(scope.marker instanceof googleMaps.Marker).to.be.equal(true);
     testTools.test.latLng(scope.marker.getPosition(), scope.map.getCenter());

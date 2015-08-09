@@ -251,39 +251,64 @@
    * @param scope {Scope}
    * @param attrs {Attributes}
    * @param controller {Controller}
-   * @param features {string} space separated attribute names to observes
-   * @param cast {function} (optional) allow to preprocess value observed
+   * @param feature {string} attribute name to observes
+   * @param cast {function} preprocess value observed
    */
-  function prop(scope, attrs, controller, features, cast) {
-    forEach(features.split(' '), function (feature) {
-      var normalised = lowercase(feature);
+  function prop(scope, attrs, controller, feature, cast) {
+    var normalised = lowercase(feature);
 
-      function callback(value) {
-        controller.then(function (obj) {
-          value = cast ? cast(value) : value;
-          if (isDefined(value)) {
-            obj['set' + ucfirst(feature)](value);
-          }
-        });
-      }
+    function callback(value) {
+      controller.then(function (obj) {
+        value = cast(value);
+        if (isDefined(value)) {
+          obj['set' + ucfirst(feature)](value);
+        }
+      });
+    }
 
-      if (normalised in attrs) {
-        scope.$watch(attrs[normalised], function (value) {
-          if (isDefined(value)) {
-            callback(value);
-          }
-        });
-      }
-      if (cast === toLatLng) {
-        address(
-          scope,
-          attrs,
-          function (latLng) {
-            callback(latLng);
-          }
-        );
-      }
+    if (normalised in attrs) {
+      scope.$watch(attrs[normalised], function (value) {
+        if (isDefined(value)) {
+          callback(value);
+        }
+      });
+    }
+    if (cast === toLatLng) {
+      address(
+        scope,
+        attrs,
+        function (latLng) {
+          callback(latLng);
+        }
+      );
+    }
+  }
+
+  /**
+   * prop handler + options object
+   * @param scope {Scope}
+   * @param attrs {Attributes}
+   * @param controller {Controller}
+   * @param features {object}
+   *                    [name]: cast
+   *                      name     {string}    property name
+   *                      cast     {function}  (optional) preprocess value
+   *
+   */
+  function props(scope, attrs, controller, features) {
+    forEach(features, function (cast, name) {
+      prop(scope, attrs, controller, name, cast);
     });
+    if ('options' in attrs) {
+      prop(scope, attrs, controller, 'options', function (value) {
+        forEach(features, function (cast, name) {
+          if (name in value) {
+            value[name] = cast(value[name]);
+          }
+        });
+        return value;
+      });
+    }
   }
 
   /**
@@ -381,7 +406,7 @@
   }
 
   /**
-   * Directive builder for overlay s
+   * Directive builder for overlays
    * @param cls           {string}    google.maps object class => ie: Marker for google.maps.Marker
    * @param buildOptions  {object}
    *          .directive  {string}    (optional) current directive name (default is 'gm' + cls)
@@ -535,9 +560,7 @@
                   options.map = map;
                 }
                 create(options);
-                forEach(buildOptions.main, function (cast, name) {
-                  prop($scope, $attrs, self, name, cast);
-                });
+                props($scope, $attrs, self, buildOptions.main);
               },
               true // once only
             );
@@ -796,11 +819,13 @@
                 function (options) {
                   create(options);
 
-                  prop($scope, $attrs, self, 'center', toLatLng);
-
-                  prop($scope, $attrs, self, 'mapTypeId');
-
-                  prop($scope, $attrs, self, 'heading tilt zoom', toNumber);
+                  props($scope, $attrs, self, {
+                    center: toLatLng,
+                    zoom: toNumber,
+                    mapTypeId: toNop,
+                    heading: toNumber,
+                    tilt: toNumber
+                  });
                 },
                 true // once only
               );
@@ -895,7 +920,7 @@
               {position: toLatLng},
               function (options) {
                 payload(options);
-                prop(scope, attrs, controllers[0], 'position', toLatLng);
+                props(scope, attrs, controllers[0], {position: toLatLng});
               },
               true
             );
@@ -1147,12 +1172,11 @@
                 {position: toLatLng},
                 function (options) {
                   create(options);
-
-                  prop($scope, $attrs, self, 'position', toLatLng);
-
-                  prop($scope, $attrs, self, 'pov');
-
-                  prop($scope, $attrs, self, 'zoom', toNumber);
+                  props($scope, $attrs, self, {
+                    position: toLatLng,
+                    pov: toNop,
+                    zoom: toNumber
+                  });
                 },
                 true // once only
               );

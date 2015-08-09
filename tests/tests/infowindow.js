@@ -45,7 +45,7 @@ describe('gmInfowindow', function () {
   });
 
   it('use map.center', function () {
-    compile('<gm-infowindow options="{position: map.getCenter()}"></gm-infowindow>');
+    compile('<gm-infowindow position="map.getCenter()"></gm-infowindow>');
     expect(scope.map instanceof googleMaps.Map).to.be.equal(true);
     expect(scope.infowindow instanceof googleMaps.InfoWindow).to.be.equal(true);
     testTools.test.latLng(scope.infowindow.getPosition(), scope.map.getCenter());
@@ -138,7 +138,7 @@ describe('gmInfowindow', function () {
   });
 
   it('test child of a marker', function () {
-    compile('<gm-marker options="{position: map.getCenter()}"><gm-infowindow></gm-infowindow></gm-marker>');
+    compile('<gm-marker position="map.getCenter()"><gm-infowindow></gm-infowindow></gm-marker>');
     expect(scope.map instanceof googleMaps.Map).to.be.equal(true);
     expect(scope.infowindow instanceof googleMaps.InfoWindow).to.be.equal(true);
     expect(scope.infowindow.__data.__map === scope.map).to.be.equal(true);

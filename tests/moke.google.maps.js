@@ -45,7 +45,7 @@ var mokeGoogle = (function () {
   var maps = {};
 
   maps.Map = createGenericObject({
-    prop: 'center div heading mapTypeId projection streetView tilt zoom',
+    prop: 'center div heading mapTypeId projection streetView tilt zoom options',
     constructor: function (mapDiv, options) {
       this.__data.__mapDiv = mapDiv;
       angular.extend(this.__data, options);
@@ -53,7 +53,7 @@ var mokeGoogle = (function () {
   });
 
   maps.StreetViewPanorama = createGenericObject({
-    prop: 'position pov zoom',
+    prop: 'position pov zoom options',
     constructor: function (mapDiv, options) {
       this.__data.__mapDiv = mapDiv;
       angular.extend(this.__data, options);
@@ -61,32 +61,32 @@ var mokeGoogle = (function () {
   });
 
   maps.Marker = createGenericObject({
-    prop: 'animation attribution clickable cursor draggable icon map opacity place position shape title visible zIndex',
+    prop: 'animation attribution clickable cursor draggable icon map opacity place position shape title visible zIndex options',
     constructor: true
   });
 
   maps.Circle = createGenericObject({
-    prop: 'bounds center draggable editable map radius visible',
+    prop: 'bounds center draggable editable map radius visible options',
     constructor: true
   });
 
   maps.Rectangle = createGenericObject({
-    prop: 'bounds draggable editable map visible',
+    prop: 'bounds draggable editable map visible options',
     constructor: true
   });
 
   maps.InfoWindow = createGenericObject({
-    prop: 'content position zIndex',
+    prop: 'content position zIndex options',
     constructor: true
   });
 
   maps.Polyline = createGenericObject({
-    prop: 'draggable editable map path visible',
+    prop: 'draggable editable map path visible options',
     constructor: true
   });
 
   maps.Polygon = createGenericObject({
-    prop: 'draggable editable map path paths visible',
+    prop: 'draggable editable map path paths visible options',
     constructor: true
   });
 
@@ -101,27 +101,27 @@ var mokeGoogle = (function () {
   };
 
   maps.DirectionsRenderer = createGenericObject({
-    prop: 'map directions',
+    prop: 'map directions options',
     constructor: true
   });
 
   maps.TrafficLayer = createGenericObject({
-    prop: 'map',
+    prop: 'map options',
     constructor: true
   });
 
   maps.BicyclingLayer = createGenericObject({
-    prop: 'map',
+    prop: 'map options',
     constructor: true
   });
 
   maps.TransitLayer = createGenericObject({
-    prop: 'map',
+    prop: 'map options',
     constructor: true
   });
 
   maps.GroundOverlay = createGenericObject({
-    prop: 'bounds:get map opacity url:get',
+    prop: 'bounds:get map opacity url:get options',
     constructor: function (url, bounds, options) {
       this.__data.url = url;
       this.__data.bounds = bounds;
@@ -130,7 +130,7 @@ var mokeGoogle = (function () {
   });
 
   maps.KmlLayer = createGenericObject({
-    prop: 'defaultViewport:get map metadata:get status:get url zIndex',
+    prop: 'defaultViewport:get map metadata:get status:get url zIndex options',
     constructor: function (url, options) {
       this.__data.url = url;
       angular.extend(this.__data, options);

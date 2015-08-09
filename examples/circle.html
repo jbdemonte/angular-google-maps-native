@@ -23,12 +23,23 @@
         <input type="checkbox" ng-model="showCircle"> Show the circle
       </label>
     </div>
+    <div class="item">
+      <label>
+        Radius: <input type="text" ng-model="radius" ng-init="radius=250000">
+      </label>
+    </div>
+    <div class="item">
+      <label>
+        fillColor: <input type="text" ng-model="fillColor" ng-init="fillColor='#008BB2'">
+      </label>
+    </div>
   </div>
 
   <gm-map options="{center: [37.772323, -122.214897], zoom: 4, mapTypeId: google.maps.MapTypeId.ROADMAP}">
     <gm-circle
         ng-show="showCircle"
-        options="{center: [37.772323, -122.214897], radius: 250000, fillColor: '#008BB2', strokeColor: '#005BB7'}"
+        center="map.getCenter()"
+        options="{radius: radius, fillColor: fillColor, strokeColor: '#005BB7'}"
     >
     </gm-circle>
   </gm-map>
