@@ -64,7 +64,7 @@
   <gm-map options="{center: [-33.8665433, 151.1956316], zoom: 15}" gm-then="getPlace(map)">
 
     <gm-marker
-        ng-repeat="place in places" options="{position: place.geometry.location}"
+        ng-repeat="place in places" position="place.geometry.location"
         on-click="show(map, marker, place)"
         >
     </gm-marker>

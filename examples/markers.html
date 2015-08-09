@@ -38,7 +38,7 @@
   <gm-map options="{center: [37.772323, -122.214897], zoom: 4, mapTypeId: google.maps.MapTypeId.ROADMAP}">
     <gm-marker
         ng-show="showMarker"
-        ng-repeat="item in items" options="{position: item.position}"
+        ng-repeat="item in items" position="item.position"
         on-click="console.log(item.name + ': ' + marker.getPosition().lat() + ',' + marker.getPosition().lng())"
     >
     </gm-marker>

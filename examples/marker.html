@@ -27,7 +27,7 @@
 
   <gm-map options="{center: [37.772323, -122.214897], zoom: 4, mapTypeId: google.maps.MapTypeId.ROADMAP}">
     <gm-marker
-        ng-show="showMarker" options="{position:  map.getCenter(), draggable: true}"
+        ng-show="showMarker" position="map.getCenter()" options="{draggable: true}"
         on-dragend="console.log('dragend on {' + marker.getPosition().lat() + ',' + marker.getPosition().lng() + '}')"
     >
     </gm-marker>
