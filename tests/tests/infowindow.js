@@ -38,27 +38,27 @@ describe('gmInfowindow', function () {
   it('test simple case', function () {
     compile('<gm-infowindow options="{position: [1,2]}"></gm-infowindow>');
     expect(scope.map instanceof googleMaps.Map).to.be.equal(true);
-    expect(scope.infowindow instanceof googleMaps.InfoWindow).to.be.equal(true);
-    expect(scope.infowindow.__data.__map === scope.map).to.be.equal(true);
-    expect(scope.infowindow.__data.__anchor).to.be.an('null');
-    testTools.test.latLng(scope.infowindow.getPosition(), 1, 2);
+    expect(scope.infoWindow instanceof googleMaps.InfoWindow).to.be.equal(true);
+    expect(scope.infoWindow.__data.__map === scope.map).to.be.equal(true);
+    expect(scope.infoWindow.__data.__anchor).to.be.an('null');
+    testTools.test.latLng(scope.infoWindow.getPosition(), 1, 2);
   });
 
   it('use map.center', function () {
     compile('<gm-infowindow position="map.getCenter()"></gm-infowindow>');
     expect(scope.map instanceof googleMaps.Map).to.be.equal(true);
-    expect(scope.infowindow instanceof googleMaps.InfoWindow).to.be.equal(true);
-    testTools.test.latLng(scope.infowindow.getPosition(), scope.map.getCenter());
+    expect(scope.infoWindow instanceof googleMaps.InfoWindow).to.be.equal(true);
+    testTools.test.latLng(scope.infoWindow.getPosition(), scope.map.getCenter());
   });
 
   it('wait for position', function () {
     compile('<gm-infowindow position="pos"></gm-infowindow>');
     expect(scope.map instanceof googleMaps.Map).to.be.equal(true);
-    expect(scope.infowindow instanceof googleMaps.InfoWindow).to.be.equal(false);
+    expect(scope.infoWindow instanceof googleMaps.InfoWindow).to.be.equal(false);
     $scope.pos = [1, 2];
     $scope.$digest();
-    expect(scope.infowindow instanceof googleMaps.InfoWindow).to.be.equal(true);
-    testTools.test.latLng(scope.infowindow.getPosition(), $scope.pos);
+    expect(scope.infoWindow instanceof googleMaps.InfoWindow).to.be.equal(true);
+    testTools.test.latLng(scope.infoWindow.getPosition(), $scope.pos);
   });
 
   it('test events', function () {
@@ -80,10 +80,10 @@ describe('gmInfowindow', function () {
 
     expect(scope.map instanceof googleMaps.Map).to.be.equal(true);
 
-    googleMaps.event.trigger(scope.infowindow, 'click');
-    googleMaps.event.trigger(scope.infowindow, 'click');
-    googleMaps.event.trigger(scope.infowindow, 'content_changed');
-    googleMaps.event.trigger(scope.infowindow, 'content_changed');
+    googleMaps.event.trigger(scope.infoWindow, 'click');
+    googleMaps.event.trigger(scope.infoWindow, 'click');
+    googleMaps.event.trigger(scope.infoWindow, 'content_changed');
+    googleMaps.event.trigger(scope.infoWindow, 'content_changed');
     $scope.$digest();
     $timeout.flush();
 
@@ -97,20 +97,20 @@ describe('gmInfowindow', function () {
 
     compile('<gm-infowindow ng-show="visible" options="{position: [1, 2]}"></gm-infowindow>');
     expect(scope.map instanceof googleMaps.Map).to.be.equal(true);
-    expect(scope.infowindow instanceof googleMaps.InfoWindow).to.be.equal(true);
-    expect(scope.infowindow.__data.__map).to.be.an('undefined');
-    expect(scope.infowindow.__data.__opened).to.be.equal(false);
+    expect(scope.infoWindow instanceof googleMaps.InfoWindow).to.be.equal(true);
+    expect(scope.infoWindow.__data.__map).to.be.an('undefined');
+    expect(scope.infoWindow.__data.__opened).to.be.equal(false);
 
     $scope.visible = true;
     $scope.$digest();
 
-    expect(scope.infowindow.__data.__map === scope.map).to.be.equal(true);
-    expect(scope.infowindow.__data.__opened).to.be.equal(true);
+    expect(scope.infoWindow.__data.__map === scope.map).to.be.equal(true);
+    expect(scope.infoWindow.__data.__opened).to.be.equal(true);
 
     $scope.visible = false;
     $scope.$digest();
 
-    expect(scope.infowindow.__data.__opened).to.be.equal(false);
+    expect(scope.infoWindow.__data.__opened).to.be.equal(false);
 
   });
 
@@ -120,29 +120,29 @@ describe('gmInfowindow', function () {
 
     compile('<gm-infowindow ng-hide="hidden" options="{position: [1, 2]}"></gm-infowindow>');
     expect(scope.map instanceof googleMaps.Map).to.be.equal(true);
-    expect(scope.infowindow instanceof googleMaps.InfoWindow).to.be.equal(true);
-    expect(scope.infowindow.__data.__map).to.be.an('undefined');
-    expect(scope.infowindow.__data.__opened).to.be.equal(false);
+    expect(scope.infoWindow instanceof googleMaps.InfoWindow).to.be.equal(true);
+    expect(scope.infoWindow.__data.__map).to.be.an('undefined');
+    expect(scope.infoWindow.__data.__opened).to.be.equal(false);
 
     $scope.hidden = false;
     $scope.$digest();
 
-    expect(scope.infowindow.__data.__map === scope.map).to.be.equal(true);
-    expect(scope.infowindow.__data.__opened).to.be.equal(true);
+    expect(scope.infoWindow.__data.__map === scope.map).to.be.equal(true);
+    expect(scope.infoWindow.__data.__opened).to.be.equal(true);
 
     $scope.hidden = true;
     $scope.$digest();
 
-    expect(scope.infowindow.__data.__opened).to.be.equal(false);
+    expect(scope.infoWindow.__data.__opened).to.be.equal(false);
 
   });
 
   it('test child of a marker', function () {
     compile('<gm-marker position="map.getCenter()"><gm-infowindow></gm-infowindow></gm-marker>');
     expect(scope.map instanceof googleMaps.Map).to.be.equal(true);
-    expect(scope.infowindow instanceof googleMaps.InfoWindow).to.be.equal(true);
-    expect(scope.infowindow.__data.__map === scope.map).to.be.equal(true);
-    expect(scope.infowindow.__data.__anchor instanceof googleMaps.Marker).to.be.equal(true);
+    expect(scope.infoWindow instanceof googleMaps.InfoWindow).to.be.equal(true);
+    expect(scope.infoWindow.__data.__map === scope.map).to.be.equal(true);
+    expect(scope.infoWindow.__data.__anchor instanceof googleMaps.Marker).to.be.equal(true);
   });
 
 });

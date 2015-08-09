@@ -888,7 +888,6 @@
     .directive('gmInfowindow', function () {
       return buildOverlay('InfoWindow', {
         require: '^?gmMarker',
-        name: 'infowindow',
         main: {
           position: toLatLng
         },

@@ -50,7 +50,7 @@ describe('gm-then', function () {
       '<gm-map options="{center: [37, -122], zoom: 8}" gm-then="data.map = data.map + 1; objects.map = map">' +
         '<gm-marker options="{position: [1,2]}" gm-then="data.marker = data.marker + 1; objects.marker = marker; objects.mapMarker = map"></gm-marker>' +
         '<gm-marker position="map.getCenter()" gm-then="data.marker = data.marker + 1">' +
-          '<gm-infowindow gm-then="data.infowindow = data.infowindow + 1; objects.infowindow = infowindow"></gm-infowindow>' +
+          '<gm-infowindow gm-then="data.infowindow = data.infowindow + 1; objects.infowindow = infoWindow"></gm-infowindow>' +
         '</gm-marker>' +
         '<gm-circle center="map.getCenter()" options="{radius: 100000}" gm-then="data.circle = data.circle + 1; objects.circle = circle"></gm-circle>' +
         '<gm-trafficLayer gm-then="data.trafficLayer = data.trafficLayer + 1; objects.trafficLayer = trafficLayer"></gm-trafficLayer>' +

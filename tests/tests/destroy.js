@@ -62,7 +62,7 @@ describe('destroy', function () {
     expect(mapController.get() instanceof googleMaps.Map).to.be.equal(true);
     expect(scope.marker instanceof googleMaps.Marker).to.be.equal(true);
     expect(markerController.get() instanceof googleMaps.Marker).to.be.equal(true);
-    expect(scope.infowindow instanceof googleMaps.InfoWindow).to.be.equal(true);
+    expect(scope.infoWindow instanceof googleMaps.InfoWindow).to.be.equal(true);
     expect(infowindowController.get() instanceof googleMaps.InfoWindow).to.be.equal(true);
 
     $scope.ifInfowindow = false;
@@ -71,7 +71,7 @@ describe('destroy', function () {
     expect(scope.map instanceof googleMaps.Map).to.be.equal(true);
     expect(scope.marker instanceof googleMaps.Marker).to.be.equal(true);
     expect(infowindowController.get()).to.be.an('undefined');
-    expect(scope.infowindow).to.be.an('undefined');
+    expect(scope.infoWindow).to.be.an('undefined');
 
     $scope.ifMarker = false;
     $scope.$digest();
@@ -79,7 +79,7 @@ describe('destroy', function () {
     expect(scope.map instanceof googleMaps.Map).to.be.equal(true);
     expect(markerController.get()).to.be.an('undefined');
     expect(infowindowController.get()).to.be.an('undefined');
-    expect(scope.infowindow).to.be.an('undefined');
+    expect(scope.infoWindow).to.be.an('undefined');
 
     $scope.ifMap = false;
     $scope.$digest();
@@ -89,7 +89,7 @@ describe('destroy', function () {
     expect(infowindowController.get()).to.be.an('undefined');
     expect(scope.map).to.be.an('undefined');
     expect(scope.marker).to.be.an('undefined');
-    expect(scope.infowindow).to.be.an('undefined');
+    expect(scope.infoWindow).to.be.an('undefined');
 
     scope = streetviewpanorama.scope();
     streetviewpanoramaController = streetviewpanorama.controller('gmStreetviewpanorama');
