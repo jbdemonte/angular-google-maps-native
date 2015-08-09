@@ -11,7 +11,7 @@ layout: api-snippets
      on-closeclick="data.last = 'map'"
   ></gm-infowindow>
 
-  <gm-marker options="{position: map.getCenter(), draggable: true}">
+  <gm-marker position="map.getCenter()" options="{draggable: true}">
     <gm-infowindow ng-show="showInfo"
       options="{content: 'Hello World from marker!'}"
       on-closeclick="data.last = 'marker'"

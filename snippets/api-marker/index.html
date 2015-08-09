@@ -7,7 +7,7 @@ layout: api-snippets
 
 <gm-map options="{center: [37, -122], zoom: 4, mapTypeId: google.maps.MapTypeId.ROADMAP}">
   <gm-marker
-    ng-show="showMarker" options="{position: map.getCenter(), draggable: true}"
+    ng-show="showMarker" position="map.getCenter()" options="{draggable: true}"
     on-dragend="data.position = marker.getPosition()"
   ></gm-marker>
 </gm-map>

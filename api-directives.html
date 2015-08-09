@@ -9,8 +9,9 @@ title: "Directives"
 <p>
   Basically, directives intend to create a google.maps object or to use a google service (e.g. <a href="https://developers.google.com/maps/documentation/javascript/directions" target="_blank">directions</a>).<br />
   Each time, directives accept an <em>options</em> attribute which depends on google object or service. <br />
-  <strong class="danger"><em>options</em> uses google.maps object / service native definition and does not watch AngularJS expressions</strong>
-  The only pre-process done on <em>options</em> is the <a href="api.html#api-latlng">LatLng</a> / <a href="api.html#api-latlngbounds">LatLngBounds</a> cast.
+  Since version 2, <em>options</em> is binded.
+  <a href="api.html#api-latlng">LatLng</a> and <a href="api.html#api-latlngbounds">LatLngBounds</a> are casted to google object.
+
 </p>
 
 <h3>Scope</h3>

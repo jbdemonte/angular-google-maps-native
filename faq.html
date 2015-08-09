@@ -11,6 +11,7 @@ active: faq
   <li><a href="#faq-show-hide">May I use ng-show / ng-hide on maps?</a></li>
   <li><a href="#faq-toogle-map-streetview">How to toogle between a Map and its StreetView?</a></li>
   <li><a href="#faq-map-streetviewpanorama">How to attach a StreetViewPanorama to a Map?</a></li>
+  <li><a href="#faq-infdig">Since version 2.0, I got a <em>infdig</em> error?</a></li>
 </ul>
 
 <h3 id="faq-load-library">Do I need to add the google maps library in the &lt;head&gt; section?</h3>
@@ -35,4 +36,17 @@ active: faq
   Use the <a href="api-gmThen.html">gm-then</a> attribute to get the google objects and to use their native methods.
 </p>
 <snippets path="snippets/faq-map-streetviewpanorama"></snippets>
+
+
+<h3 id="faq-infdig">Since version 2.0, I got a <em>infdig</em> error?</h3>
+<p>
+  <em>options</em> object is now watched to update the google object using the <em>setOptions</em> function. <br />
+  This new feature disable the possibility to use this kind of code:
+</p>
+<pre class="code"><code class="language-markup">&lt;marker options="{position:map.getCenter()}"&gt;&lt;/marker&gt;</code></pre>
+<p>You need to update to:</p>
+<pre class="code"><code class="language-markup">&lt;marker position="map.getCenter()" options="{...}"&gt;&lt;/marker&gt;</code></pre>
+<p>
+  Else, you'll get the <a href="https://docs.angularjs.org/error/$rootScope/infdig" target="_blank">Infinite $digest Loop error</a>.
+</p>
 

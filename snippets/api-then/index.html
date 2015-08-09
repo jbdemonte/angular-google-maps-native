@@ -14,7 +14,7 @@ script: |
 <body ng-controller="MyCtrl">
 
 <gm-map options="{center: [37, -122], zoom: 4, mapTypeId: google.maps.MapTypeId.ROADMAP}">
-  <gm-marker options="{position: map.getCenter()}" gm-then="animate(marker)"></gm-marker>
+  <gm-marker position="map.getCenter()" gm-then="animate(marker)"></gm-marker>
 </gm-map>
 
 </body>
