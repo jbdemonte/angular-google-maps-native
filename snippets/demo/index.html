@@ -1,11 +1,7 @@
-<!DOCTYPE html>
-<html ng-app="MyApp">
-  <head>
-    <link rel="stylesheet" type="text/css" href="style.css">
-    <script src="../angular.min.js"></script>
-    <script src="../angular-google-maps-native.min.js"></script>
-    <script src="app.js"></script>
-  </head>
+---
+layout: api-snippets
+---
+{% raw %}
   <body ng-init="coords={latitude: false, longitude: false}">
 
     <gm-map options="{center: [37.772323, -122.214897], zoom: 8, mapTypeId: google.maps.MapTypeId.ROADMAP}">
@@ -16,4 +12,4 @@
 
     <div ng-if="coords.latitude !== false">Dragend on [{{coords.latitude}}, {{coords.longitude}}]</div>
   </body>
-</html>
+{% endraw %}
