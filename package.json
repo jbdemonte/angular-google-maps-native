@@ -23,7 +23,7 @@
     "googlemaps",
     "directives"
   ],
-  "main": "dist/angular-google-maps-native.min.js",
+  "main": "index.js",
   "files": [
     "dist/*"
   ],
