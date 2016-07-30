@@ -18,7 +18,7 @@
     "directives"
   ],
   "dependencies": {
-    "angular": "1.2 - 1.4"
+    "angular": "1.2 - 1.5"
   },
   "ignore": [
     "*.json",
