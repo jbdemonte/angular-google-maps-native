@@ -1,22 +1,21 @@
 var testTools = {
 
   mokeGMLibrary: function () {
-    var $document, $window, $rootScope, $q, $parse, $timeout,
-      provider;
+    var $document, $window, $rootScope, $q, $parse, $timeout, provider;
 
     beforeEach(function () {
-      var fakeModule = angular.module('test.app.config', function () {});
+      var testApp = angular.module('test.app.config', ['GoogleMapsNative'], function () {});
 
-      fakeModule.config(function (gmLibraryProvider) {
+      testApp.config(function (gmLibraryProvider) {
         provider = gmLibraryProvider;
       });
 
-      module('GoogleMapsNative', 'test.app.config');
+      module('test.app.config');
 
       inject(function () {});
     });
 
-    beforeEach(inject(function(_$window_, _$document_, _$rootScope_, _$q_, _$parse_, _$timeout_) {
+    beforeEach(inject(function (_$window_, _$document_, _$rootScope_, _$q_, _$parse_, _$timeout_) {
       $window = _$window_;
       $document = _$document_;
       $rootScope = _$rootScope_;
@@ -25,8 +24,7 @@ var testTools = {
       $timeout = _$timeout_;
     }));
 
-    beforeEach(function(){
-
+    beforeEach(function () {
       var gmLibrary;
 
       provider.configure({
@@ -85,8 +83,7 @@ var testTools = {
       var catched = false;
       try {
         flushable.flush();
-      }
-      catch(err) {
+      } catch (err) {
         catched = true;
       }
       expect(catched).to.be.equal(true);

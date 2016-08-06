@@ -8,13 +8,13 @@ describe('Provider', function () {
   //---------------------------------------------------------------------------
 
   beforeEach(function () {
-    var fakeModule = angular.module('test.app.config', function () {});
+    var testApp = angular.module('test.app.config', ['GoogleMapsNative'], function () {});
 
-    fakeModule.config(function (gmLibraryProvider) {
+    testApp.config(function (gmLibraryProvider) {
       provider = gmLibraryProvider;
     });
 
-    module('GoogleMapsNative', 'test.app.config');
+    module('test.app.config');
 
     inject(function () {});
   });
