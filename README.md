@@ -1,6 +1,6 @@
 # angular-google-maps-native
 
-[![NPM version][npm-image]][npm-url] [![Bower version][bower-image]][bower-url] [![Build Status][travis-image]][travis-url] [![Coverage Status][coverage-image]][coverage-url]
+[![NPM version][npm-image]][npm-url] [![Bower version][bower-image]][bower-url] [![Build Status][travis-image]][travis-url] [![Package Quality][quality-image]][quality-url] [![Coverage Status][coverage-image]][coverage-url]
 
 ## About
 
@@ -31,3 +31,6 @@ If you like this plugin give it a thumbs up at [ngmodules](http://ngmodules.org/
 
 [coverage-url]: https://coveralls.io/github/jbdemonte/angular-google-maps-native?branch=master
 [coverage-image]: https://coveralls.io/repos/jbdemonte/angular-google-maps-native/badge.svg?branch=master&service=github
+
+[quality-url]: http://packagequality.com/#?package=angular-google-maps-native
+[quality-image]: http://npm.packagequality.com/shield/angular-google-maps-native.svg
